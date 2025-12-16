@@ -2,8 +2,20 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>中英文单词消消乐</title>
+  <title>中英文单词消消乐 - English Vocabulary Matching Game | 免费英语单词记忆游戏</title>
+  <meta name="description" content="一款免费在线中英文单词消消乐游戏 (English Vocabulary Match Game)。内置初中、高中、IT英语、出国留学及日常口语短语等丰富词库。无需下载，打开即玩，通过点击配对与真人发音助你轻松记忆英语单词，寓教于乐。Free educational game to learn English vocabulary." />
+  <meta name="keywords" content="单词消消乐, 英语单词游戏, English Vocabulary Game, 记单词, 英语学习, English Learning, 单词配对, Word Match, 初中英语, 高中英语, IT英语, 免费英语游戏, Free English Game, Web Speech API" />
+  <meta name="author" content="English Learning Games" />
+  <meta property="og:title" content="中英文单词消消乐 - English Vocabulary Matching Game" />
+  <meta property="og:description" content="好玩的免费英语单词记忆游戏！包含初高中、IT及出国常用词汇，点击发音，配对消除，轻松提升词汇量。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="中英文单词消消乐 - English Vocabulary Matching Game" />
+  <meta name="twitter:description" content="Play this free English vocabulary matching game! Learn words with audio pronunciation and fun matching gameplay." />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <link rel="canonical" href="./" />
   <style>
     /* ===== 基础布局与排版 ===== */
     :root {
@@ -692,6 +704,27 @@
       display: none;
     }
 
+    @media (max-width: 640px) {
+      .card-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 8px;
+        width: min(900px, 96vw);
+        max-height: none;
+        aspect-ratio: auto;
+        padding: 6px 4px;
+      }
+      .card {
+        min-height: 64px;
+        padding: 8px 4px;
+      }
+      .card-text-en {
+        font-size: 0.95rem;
+      }
+      .card-text-zh {
+        font-size: 0.9rem;
+      }
+    }
+
     @media (max-width: 480px) {
       .title-main {
         font-size: 0.95rem;
@@ -723,6 +756,7 @@
             <option value="junior">初中英语</option>
             <option value="senior">高中英语</option>
             <option value="it">IT 英语</option>
+            <option value="github">GitHub 词汇</option>
             <option value="abroad">出国英语</option>
             <option value="phrase">常用英语短语</option>
           </select>
@@ -985,6 +1019,165 @@
         { en: "concurrency", zh: "并发" },
         { en: "thread", zh: "线程" },
         { en: "performance", zh: "性能" }
+      ],
+      github: [
+        { en: "GitHub", zh: "GitHub（代码托管平台）" },
+        { en: "repository", zh: "仓库" },
+        { en: "repo", zh: "仓库（简称）" },
+        { en: "organization", zh: "组织" },
+        { en: "team", zh: "团队" },
+        { en: "member", zh: "成员" },
+        { en: "owner", zh: "所有者" },
+        { en: "maintainer", zh: "维护者" },
+        { en: "contributor", zh: "贡献者" },
+        { en: "collaborator", zh: "协作者" },
+        { en: "invite", zh: "邀请" },
+        { en: "invitation", zh: "邀请（通知）" },
+        { en: "profile", zh: "个人资料" },
+        { en: "avatar", zh: "头像" },
+        { en: "username", zh: "用户名" },
+        { en: "account", zh: "账号" },
+        { en: "settings", zh: "设置" },
+        { en: "permission", zh: "权限" },
+        { en: "role", zh: "角色" },
+        { en: "access", zh: "访问权限" },
+        { en: "private", zh: "私有" },
+        { en: "public", zh: "公开" },
+        { en: "fork", zh: "派生（Fork）" },
+        { en: "forked", zh: "已派生的" },
+        { en: "star", zh: "收藏（Star）" },
+        { en: "stars", zh: "收藏数" },
+        { en: "watch", zh: "关注（Watch）" },
+        { en: "watching", zh: "关注中" },
+        { en: "unwatch", zh: "取消关注" },
+        { en: "follow", zh: "关注（用户）" },
+        { en: "unfollow", zh: "取消关注（用户）" },
+        { en: "topic", zh: "主题标签" },
+        { en: "language", zh: "语言" },
+        { en: "license", zh: "许可证" },
+        { en: "README", zh: "自述文件" },
+        { en: "CONTRIBUTING", zh: "贡献指南" },
+        { en: "CODE_OF_CONDUCT", zh: "行为准则" },
+        { en: "SECURITY", zh: "安全政策" },
+        { en: "CHANGELOG", zh: "更新日志" },
+        { en: "template", zh: "模板" },
+        { en: "issue template", zh: "Issue 模板" },
+        { en: "pull request template", zh: "PR 模板" },
+        { en: "Wiki", zh: "维基" },
+        { en: "Pages", zh: "Pages 静态站点" },
+        { en: "gist", zh: "代码片段（Gist）" },
+        { en: "directory", zh: "目录" },
+        { en: "file", zh: "文件" },
+        { en: "path", zh: "路径" },
+        { en: "branch", zh: "分支" },
+        { en: "default branch", zh: "默认分支" },
+        { en: "base branch", zh: "基分支" },
+        { en: "head branch", zh: "源分支" },
+        { en: "protected branch", zh: "受保护分支" },
+        { en: "branch protection", zh: "分支保护" },
+        { en: "tag", zh: "标签（Tag）" },
+        { en: "release", zh: "发布版本" },
+        { en: "release notes", zh: "发布说明" },
+        { en: "draft", zh: "草稿" },
+        { en: "milestone", zh: "里程碑" },
+        { en: "project", zh: "项目" },
+        { en: "board", zh: "看板" },
+        { en: "card", zh: "卡片" },
+        { en: "column", zh: "列" },
+        { en: "backlog", zh: "待办（Backlog）" },
+        { en: "roadmap", zh: "路线图" },
+        { en: "issue", zh: "问题（Issue）" },
+        { en: "bug", zh: "缺陷" },
+        { en: "feature", zh: "新功能" },
+        { en: "enhancement", zh: "增强" },
+        { en: "task", zh: "任务" },
+        { en: "label", zh: "标签（Label）" },
+        { en: "assignee", zh: "负责人" },
+        { en: "reviewer", zh: "审阅者" },
+        { en: "comment", zh: "评论" },
+        { en: "discussion", zh: "讨论" },
+        { en: "thread", zh: "讨论串" },
+        { en: "mention", zh: "提及（@）" },
+        { en: "subscribe", zh: "订阅" },
+        { en: "unsubscribe", zh: "取消订阅" },
+        { en: "notification", zh: "通知" },
+        { en: "inbox", zh: "收件箱" },
+        { en: "pull request", zh: "拉取请求（PR）" },
+        { en: "PR", zh: "拉取请求（简称）" },
+        { en: "review", zh: "审阅" },
+        { en: "approve", zh: "批准" },
+        { en: "request changes", zh: "请求修改" },
+        { en: "merge", zh: "合并" },
+        { en: "merge commit", zh: "合并提交" },
+        { en: "squash", zh: "压缩合并（Squash）" },
+        { en: "rebase", zh: "变基（Rebase）" },
+        { en: "cherry-pick", zh: "拣选提交（Cherry-pick）" },
+        { en: "revert", zh: "回退提交（Revert）" },
+        { en: "reset", zh: "重置（Reset）" },
+        { en: "stash", zh: "暂存改动（Stash）" },
+        { en: "commit", zh: "提交" },
+        { en: "commit message", zh: "提交信息" },
+        { en: "author", zh: "作者" },
+        { en: "committer", zh: "提交者" },
+        { en: "diff", zh: "差异" },
+        { en: "patch", zh: "补丁" },
+        { en: "compare", zh: "对比" },
+        { en: "conflict", zh: "冲突" },
+        { en: "merge conflict", zh: "合并冲突" },
+        { en: "resolve", zh: "解决" },
+        { en: "resolution", zh: "解决方案" },
+        { en: "status", zh: "状态" },
+        { en: "status check", zh: "状态检查" },
+        { en: "checks", zh: "检查项" },
+        { en: "CI", zh: "持续集成（CI）" },
+        { en: "workflow", zh: "工作流" },
+        { en: "GitHub Actions", zh: "GitHub Actions 自动化" },
+        { en: "job", zh: "任务（Job）" },
+        { en: "step", zh: "步骤（Step）" },
+        { en: "runner", zh: "运行器（Runner）" },
+        { en: "self-hosted", zh: "自托管" },
+        { en: "matrix", zh: "矩阵（多环境）" },
+        { en: "artifact", zh: "构建产物" },
+        { en: "cache", zh: "缓存" },
+        { en: "environment", zh: "环境" },
+        { en: "secret", zh: "密钥（Secret）" },
+        { en: "token", zh: "令牌（Token）" },
+        { en: "PAT", zh: "个人访问令牌" },
+        { en: "SSH key", zh: "SSH 密钥" },
+        { en: "deploy key", zh: "部署密钥" },
+        { en: "webhook", zh: "Webhook" },
+        { en: "API", zh: "API 接口" },
+        { en: "REST", zh: "REST 接口" },
+        { en: "GraphQL", zh: "GraphQL" },
+        { en: "endpoint", zh: "端点" },
+        { en: "rate limit", zh: "速率限制" },
+        { en: "pagination", zh: "分页" },
+        { en: "clone", zh: "克隆" },
+        { en: "remote", zh: "远程仓库" },
+        { en: "origin", zh: "远程源（origin）" },
+        { en: "upstream", zh: "上游（upstream）" },
+        { en: "fetch", zh: "抓取（fetch）" },
+        { en: "pull", zh: "拉取（pull）" },
+        { en: "push", zh: "推送（push）" },
+        { en: "checkout", zh: "切换分支（checkout）" },
+        { en: "delete", zh: "删除" },
+        { en: "archive", zh: "归档" },
+        { en: "archived", zh: "已归档" },
+        { en: "forks", zh: "派生数" },
+        { en: "insights", zh: "洞察" },
+        { en: "traffic", zh: "流量" },
+        { en: "security", zh: "安全" },
+        { en: "vulnerability", zh: "漏洞" },
+        { en: "advisory", zh: "安全公告" },
+        { en: "alert", zh: "告警" },
+        { en: "Dependabot", zh: "依赖更新机器人" },
+        { en: "dependency", zh: "依赖" },
+        { en: "update", zh: "更新" },
+        { en: "version", zh: "版本" },
+        { en: "audit", zh: "审计" },
+        { en: "code scanning", zh: "代码扫描" },
+        { en: "secret scanning", zh: "密钥扫描" },
+        { en: "permissions", zh: "权限设置" }
       ],
       // 出国英语词汇
       abroad: [
