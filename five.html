@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>豪华版五子棋 - Gomoku Deluxe</title>
+    <style>
+        :root {
+            --bg-color: #f0f0f0;
+            --panel-bg: rgba(255, 255, 255, 0.9);
+            --text-color: #333;
+            --accent-color: #4a90e2;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            transition: background 0.5s ease;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+            padding: 30px;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            width: 95vw;
+            height: 95vh;
+            box-sizing: border-box;
+        }
+
+        #canvas-wrapper {
+            position: relative;
+            flex: 1 1 auto; /* Take up remaining space */
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.02); /* Slight tint for the wrapper */
+        }
+
+        canvas {
+            display: block;
+            touch-action: none;
+            /* Canvas will be sized by JS, but ensure it doesn't overflow */
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+
+        #sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 350px; /* Wider sidebar */
+            min-width: 300px;
+            padding: 20px;
+            justify-content: center; /* Center content vertically */
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 48px; /* Larger title */
+            text-align: center;
+            color: var(--text-color);
+            font-weight: 800;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.6);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-size: 20px; /* Larger label */
+            font-weight: 700;
+            color: #555;
+        }
+
+        select, button {
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            font-size: 18px; /* Larger input text */
+            outline: none;
+            transition: all 0.2s;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        select:hover, button:hover {
+            border-color: var(--accent-color);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            font-weight: 800;
+            font-size: 24px; /* Larger button */
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+            letter-spacing: 2px;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        .status-display {
+            text-align: center;
+            font-size: 28px; /* Larger status text */
+            font-weight: 800;
+            padding: 20px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .turn-indicator {
+            width: 24px; /* Larger dot */
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            #game-container {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px;
+                gap: 20px;
+            }
+            
+            #sidebar {
+                width: 100%;
+                min-width: unset;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .panel {
+                flex: 1;
+                min-width: 200px;
+                padding: 15px;
+            }
+            
+            .control-group {
+                margin-bottom: 10px;
+            }
+
+            h1 { font-size: 32px; width: 100%; margin-bottom: 10px;}
+            
+            #canvas-wrapper {
+                flex: 1;
+                min-height: 50vh;
+            }
+        }
+
+        /* Skin Styles injected via JS */
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="canvas-wrapper">
+        <canvas id="board"></canvas>
+    </div>
+
+    <div id="sidebar">
+        <h1>五子棋豪华版</h1>
+        
+        <div class="panel">
+            <div class="status-display">
+                <span id="status-text">玩家回合</span>
+                <div id="turn-dot" class="turn-indicator" style="background: black;"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="control-group">
+                <label>难度等级</label>
+                <select id="difficulty-select">
+                    <option value="easy">简单 (入门)</option>
+                    <option value="medium" selected>中等 (进阶)</option>
+                    <option value="hard">困难 (大师)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>皮肤风格</label>
+                <select id="skin-select">
+                    <option value="wood" selected>极简木质</option>
+                    <option value="ink">水墨国风</option>
+                    <option value="tech">深色科技</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>音效</label>
+                <button id="sound-toggle">🔊 音效开启</button>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button id="undo-btn" class="btn-primary" style="flex: 1; background: #f39c12;">悔棋 (9)</button>
+            <button id="restart-btn" class="btn-primary" style="flex: 1;">重新开始</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * Gomoku Deluxe - Single File Implementation
+ * Contains: Game Logic, AI (Minimax+AlphaBeta), Rendering, Audio
+ */
+
+// --- Constants ---
+const BOARD_SIZE = 15;
+const EMPTY = 0;
+const BLACK = 1; // Player
+const WHITE = 2; // AI
+
+// --- Audio System (Web Audio API) ---
+const AudioSys = {
+    ctx: null,
+    enabled: true,
+    
+    init() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+        } catch (e) {
+            console.warn('Web Audio API not supported');
+        }
+    },
+
+    playTone(freq, type, duration, vol = 0.1) {
+        if (!this.enabled || !this.ctx) return;
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        
+        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    },
+
+    playMove(isBlack) {
+        // High pitch for white (stone), lower for black (wood/stone)
+        // Adding a bit of noise or impact sound would be better but simple osc works for "clean" feel
+        const freq = isBlack ? 300 : 800; 
+        this.playTone(freq, 'sine', 0.15, 0.3);
+    },
+
+    playWin() {
+        if (!this.enabled || !this.ctx) return;
+        // Simple major arpeggio
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            setTimeout(() => this.playTone(f, 'triangle', 0.4, 0.2), i * 150);
+        });
+    },
+
+    playLose() {
+        if (!this.enabled || !this.ctx) return;
+         const now = this.ctx.currentTime;
+        [440, 415, 392, 370].forEach((f, i) => {
+             setTimeout(() => this.playTone(f, 'sine', 0.4, 0.2), i * 150);
+        });
+    }
+};
+
+// --- Skin Configurations ---
+const SKINS = {
+    wood: {
+        name: 'wood',
+        bg: '#dcb35c', // 经典的榧木色，更暖更亮
+        grid: '#4e342e', // 深褐色，对比清晰
+        border: '#3e2723', // 棋盘边框
+        lastMove: '#d32f2f',
+        winLine: '#d32f2f',
+        font: '#4e342e',
+        // 黑棋：云子黑（带绿光）
+        blackPiece: { 
+            color: '#0a0a0a', 
+            highlight: '#404040', 
+            glow: 'rgba(0,0,0,0.5)',
+            rim: '#222' 
+        },
+        // 白棋：云子白（温润玉色）
+        whitePiece: { 
+            color: '#f5f5f5', 
+            highlight: '#ffffff', 
+            glow: 'rgba(255,255,255,0.8)',
+            rim: '#ddd'
+        }
+    },
+    ink: {
+        name: 'ink',
+        bg: '#fdfbf7', // 极简宣纸白
+        grid: '#2c3e50', // 墨色
+        border: '#95a5a6',
+        lastMove: '#c0392b', // 朱砂红
+        winLine: '#e74c3c',
+        font: '#2c3e50',
+        blackPiece: { 
+            color: '#1a1a1a', 
+            highlight: '#595959',
+            glow: 'rgba(0,0,0,0.4)',
+            rim: '#333'
+        },
+        whitePiece: { 
+            color: '#ecf0f1', 
+            highlight: '#ffffff',
+            glow: 'rgba(236, 240, 241, 0.8)',
+            rim: '#bdc3c7'
+        }
+    },
+    tech: {
+        name: 'tech',
+        bg: '#212529', // 高级灰黑，非纯黑
+        grid: '#6c757d', // 亮灰色网格，确保清晰可见
+        border: '#495057',
+        lastMove: '#00ff88', // 赛博绿
+        winLine: '#ff0055', // 霓虹红
+        font: '#f8f9fa',
+        blackPiece: { 
+            color: '#000000', 
+            highlight: '#212529',
+            glow: 'rgba(0, 255, 136, 0.2)', // 隐约绿光
+            rim: '#00ff88' // 霓虹边框
+        },
+        whitePiece: { 
+            color: '#e9ecef', 
+            highlight: '#f8f9fa',
+            glow: 'rgba(255, 255, 255, 0.5)',
+            rim: '#adb5bd'
+        }
+    }
+};
+
+// --- Game Logic ---
+class GomokuGame {
+    constructor() {
+        this.board = [];
+        this.history = [];
+        this.currentPlayer = BLACK;
+        this.gameOver = false;
+        this.winner = null;
+        this.difficulty = 'medium';
+        this.winningLine = null;
+        this.maxUndo = 9;
+        this.undoCount = 0;
+        this.initBoard();
+    }
+
+    initBoard() {
+        this.board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(EMPTY));
+        this.history = [];
+        this.currentPlayer = BLACK;
+        this.gameOver = false;
+        this.winner = null;
+        this.winningLine = null;
+        this.undoCount = 0;
+    }
+
+    undo() {
+        if (this.undoCount >= this.maxUndo) return false;
+        if (this.history.length < 2) return false; // Need at least 2 moves (1 round)
+
+        // Remove last 2 moves (AI + Player)
+        // Note: If game over and AI won, AI moved last.
+        // If Player won, Player moved last. But in PvE, AI moves immediately.
+        // So usually history is even.
+        // If game over, we just pop until we are back to Player turn.
+        
+        // Actually, for simplicity in PvE:
+        // Always pop 2 moves to return to the state before the player's last move.
+        
+        // 1. Pop AI move
+        let last = this.history.pop();
+        this.board[last.y][last.x] = EMPTY;
+        
+        // 2. Pop Player move
+        last = this.history.pop();
+        this.board[last.y][last.x] = EMPTY;
+        
+        // Reset state
+        this.gameOver = false;
+        this.winner = null;
+        this.winningLine = null;
+        this.currentPlayer = BLACK; // Always player's turn after undo in PvE
+        
+        this.undoCount++;
+        return true;
+    }
+
+    isValid(x, y) {
+        return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
+    }
+
+    makeMove(x, y) {
+        if (this.gameOver || !this.isValid(x, y) || this.board[y][x] !== EMPTY) return false;
+        
+        this.board[y][x] = this.currentPlayer;
+        this.history.push({x, y, player: this.currentPlayer});
+        
+        const winInfo = this.checkWin(x, y, this.currentPlayer);
+        if (winInfo) {
+            this.gameOver = true;
+            this.winner = this.currentPlayer;
+            this.winningLine = winInfo;
+        } else {
+            this.currentPlayer = this.currentPlayer === BLACK ? WHITE : BLACK;
+        }
+        return true;
+    }
+
+    checkWin(x, y, player) {
+        const directions = [
+            [1, 0],  // Horizontal
+            [0, 1],  // Vertical
+            [1, 1],  // Diagonal \
+            [1, -1]  // Diagonal /
+        ];
+
+        for (let [dx, dy] of directions) {
+            let count = 1;
+            let line = [{x, y}];
+
+            // Check forward
+            let i = 1;
+            while (true) {
+                let nx = x + dx * i;
+                let ny = y + dy * i;
+                if (!this.isValid(nx, ny) || this.board[ny][nx] !== player) break;
+                count++;
+                line.push({x: nx, y: ny});
+                i++;
+            }
+
+            // Check backward
+            i = 1;
+            while (true) {
+                let nx = x - dx * i;
+                let ny = y - dy * i;
+                if (!this.isValid(nx, ny) || this.board[ny][nx] !== player) break;
+                count++;
+                line.push({x: nx, y: ny});
+                i++;
+            }
+
+            if (count >= 5) return line;
+        }
+        return null;
+    }
+}
+
+// --- AI Engine ---
+class GomokuAI {
+    constructor(game) {
+        this.game = game;
+        this.scores = {
+            FIVE: 1000000,
+            LIVE_FOUR: 50000,
+            DEAD_FOUR: 5000,
+            LIVE_THREE: 5000,
+            DEAD_THREE: 1000,
+            LIVE_TWO: 500,
+            DEAD_TWO: 100
+        };
+    }
+
+    getBestMove() {
+        const difficulty = this.game.difficulty;
+        
+        // 1. Easy: Random valid move
+        if (difficulty === 'easy') {
+            return this.getEasyMove();
+        }
+
+        // 2. Medium: Depth 2
+        if (difficulty === 'medium') {
+            return this.minimaxRoot(2);
+        }
+
+        // 3. Hard: Depth 4 (or 3 depending on performance)
+        if (difficulty === 'hard') {
+            return this.minimaxRoot(4);
+        }
+        
+        return this.getEasyMove();
+    }
+
+    getEasyMove() {
+        let candidates = this.generateCandidates(1);
+        if (candidates.length === 0) return {x: 7, y: 7};
+        candidates.sort(() => Math.random() - 0.5);
+        return candidates[0];
+    }
+
+    generateCandidates(radius = 1) {
+        const candidates = [];
+        const visited = new Set();
+        const board = this.game.board;
+
+        // If empty board
+        if (this.game.history.length === 0) return [{x: 7, y: 7}];
+
+        // Optimization: use a Set for occupied cells to quickly find neighbors
+        // But iterating board is fast enough for 15x15
+        for (let y = 0; y < BOARD_SIZE; y++) {
+            for (let x = 0; x < BOARD_SIZE; x++) {
+                if (board[y][x] !== EMPTY) {
+                    for (let dy = -radius; dy <= radius; dy++) {
+                        for (let dx = -radius; dx <= radius; dx++) {
+                            if (dx === 0 && dy === 0) continue;
+                            let nx = x + dx, ny = y + dy;
+                            if (this.game.isValid(nx, ny) && board[ny][nx] === EMPTY) {
+                                let key = `${nx},${ny}`;
+                                if (!visited.has(key)) {
+                                    candidates.push({x: nx, y: ny});
+                                    visited.add(key);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return candidates;
+    }
+
+    minimaxRoot(depth) {
+        let candidates = this.generateCandidates(1);
+        if (candidates.length === 0) return {x: 7, y: 7};
+
+        let bestScore = -Infinity;
+        let bestMove = candidates[0];
+        let alpha = -Infinity;
+        let beta = Infinity;
+
+        // Heuristic sort for Alpha-Beta (check center-ish moves first or simple eval)
+        // For now, we shuffle to avoid predictable play if scores are equal
+        candidates.sort(() => Math.random() - 0.5);
+
+        for (let move of candidates) {
+            this.game.board[move.y][move.x] = WHITE;
+            // Check immediate win
+            if (this.checkWinQuick(move.x, move.y, WHITE)) {
+                this.game.board[move.y][move.x] = EMPTY;
+                return move;
+            }
+            
+            let score = this.minimax(depth - 1, alpha, beta, false);
+            this.game.board[move.y][move.x] = EMPTY;
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = move;
+            }
+            alpha = Math.max(alpha, score);
+        }
+
+        return bestMove;
+    }
+
+    minimax(depth, alpha, beta, isMaximizing) {
+        // Evaluate leaf
+        if (depth === 0) {
+            return this.evaluateBoard();
+        }
+
+        let candidates = this.generateCandidates(1);
+        // If no moves possible (draw), return 0
+        if (candidates.length === 0) return 0;
+
+        if (isMaximizing) { // AI (WHITE)
+            let maxEval = -Infinity;
+            for (let move of candidates) {
+                this.game.board[move.y][move.x] = WHITE;
+                if (this.checkWinQuick(move.x, move.y, WHITE)) {
+                    this.game.board[move.y][move.x] = EMPTY;
+                    return this.scores.FIVE; // Win found
+                }
+                
+                let evalScore = this.minimax(depth - 1, alpha, beta, false);
+                this.game.board[move.y][move.x] = EMPTY;
+                
+                maxEval = Math.max(maxEval, evalScore);
+                alpha = Math.max(alpha, evalScore);
+                if (beta <= alpha) break;
+            }
+            return maxEval;
+        } else { // Human (BLACK)
+            let minEval = Infinity;
+            for (let move of candidates) {
+                this.game.board[move.y][move.x] = BLACK;
+                if (this.checkWinQuick(move.x, move.y, BLACK)) {
+                    this.game.board[move.y][move.x] = EMPTY;
+                    return -this.scores.FIVE; // Loss found
+                }
+
+                let evalScore = this.minimax(depth - 1, alpha, beta, true);
+                this.game.board[move.y][move.x] = EMPTY;
+                
+                minEval = Math.min(minEval, evalScore);
+                beta = Math.min(beta, evalScore);
+                if (beta <= alpha) break;
+            }
+            return minEval;
+        }
+    }
+
+    checkWinQuick(x, y, player) {
+        // Quick check if a move wins (used inside minimax for speed)
+        // Similar to game.checkWin but returns boolean
+        const directions = [[1,0], [0,1], [1,1], [1,-1]];
+        for (let [dx, dy] of directions) {
+            let count = 1;
+            for (let i = 1; i < 5; i++) {
+                if (!this.game.isValid(x+dx*i, y+dy*i) || this.game.board[y+dy*i][x+dx*i] !== player) break;
+                count++;
+            }
+            for (let i = 1; i < 5; i++) {
+                if (!this.game.isValid(x-dx*i, y-dy*i) || this.game.board[y-dy*i][x-dx*i] !== player) break;
+                count++;
+            }
+            if (count >= 5) return true;
+        }
+        return false;
+    }
+
+    evaluateBoard() {
+        let score = 0;
+        // Analyze entire board for both
+        score += this.evaluateAllLines(WHITE);
+        score -= this.evaluateAllLines(BLACK) * 1.5; // Defensive bias
+        return score;
+    }
+
+    evaluateAllLines(player) {
+        let total = 0;
+        const board = this.game.board;
+        const width = BOARD_SIZE;
+        const height = BOARD_SIZE;
+
+        // Arrays to avoid creating new objects constantly
+        // We will scan 4 directions: - (0,1), | (1,0), \ (1,1), / (1,-1)
+        
+        // 1. Horizontal
+        for (let y = 0; y < height; y++) {
+            total += this.scanLine(player, 0, y, 1, 0, width);
+        }
+        
+        // 2. Vertical
+        for (let x = 0; x < width; x++) {
+            total += this.scanLine(player, x, 0, 0, 1, height);
+        }
+
+        // 3. Diagonal \ (Top-left to bottom-right)
+        // Starts from x=0,y=0...14 and x=1...14,y=0
+        for (let k = 0; k < width; k++) {
+            // (k, 0) -> (k+i, i)
+            total += this.scanLine(player, k, 0, 1, 1, width - k);
+            if (k > 0) {
+                 // (0, k) -> (i, k+i)
+                total += this.scanLine(player, 0, k, 1, 1, height - k);
+            }
+        }
+
+        // 4. Diagonal / (Top-right to bottom-left)
+        // Starts from x=0...14,y=0
+        for (let k = 0; k < width; k++) {
+            // (k, 0) -> (k-i, i)
+            total += this.scanLine(player, k, 0, -1, 1, k + 1);
+            if (k > 0) {
+                // (14, k) -> (14-i, k+i)
+                total += this.scanLine(player, width - 1, k, -1, 1, height - k);
+            }
+        }
+
+        return total;
+    }
+
+    scanLine(player, startX, startY, dx, dy, count) {
+        let score = 0;
+        let consecutive = 0;
+        let openEnds = 0; // 0, 1, or 2 (blocked or open)
+        let blockedStart = true; // Is the start of the current sequence blocked?
+
+        // Check previous cell for block status
+        let px = startX - dx;
+        let py = startY - dy;
+        if (this.game.isValid(px, py) && this.game.board[py][px] === EMPTY) {
+            blockedStart = false;
+        }
+
+        for (let i = 0; i < count; i++) {
+            let cx = startX + dx * i;
+            let cy = startY + dy * i;
+            let cell = this.game.board[cy][cx];
+
+            if (cell === player) {
+                consecutive++;
+            } else {
+                if (consecutive > 0) {
+                    // Sequence ended
+                    let blockedEnd = true;
+                    if (cell === EMPTY) blockedEnd = false;
+                    
+                    score += this.getShapeScore(consecutive, !blockedStart, !blockedEnd);
+                    
+                    consecutive = 0;
+                }
+                
+                blockedStart = (cell !== EMPTY); // If current is opponent, next seq starts blocked
+            }
+        }
+        
+        // End of line check
+        if (consecutive > 0) {
+            score += this.getShapeScore(consecutive, !blockedStart, false); // End is blocked by board edge
+        }
+
+        return score;
+    }
+
+    getShapeScore(length, openStart, openEnd) {
+        if (length >= 5) return this.scores.FIVE;
+        
+        let openCount = (openStart ? 1 : 0) + (openEnd ? 1 : 0);
+        
+        if (length === 4) {
+            if (openCount === 2) return this.scores.LIVE_FOUR;
+            if (openCount === 1) return this.scores.DEAD_FOUR;
+        }
+        if (length === 3) {
+            if (openCount === 2) return this.scores.LIVE_THREE;
+            if (openCount === 1) return this.scores.DEAD_THREE;
+        }
+        if (length === 2) {
+            if (openCount === 2) return this.scores.LIVE_TWO;
+            if (openCount === 1) return this.scores.DEAD_TWO;
+        }
+        return 0;
+    }
+}
+
+// --- View / Rendering ---
+class GomokuView {
+    constructor(game, canvasId) {
+        this.game = game;
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d', { alpha: false }); // Optimize
+        this.skin = SKINS.wood; // Default
+        this.cellSize = 0;
+        this.padding = 0;
+        
+        this.resize();
+        window.addEventListener('resize', () => {
+            this.resize();
+            this.draw();
+        });
+    }
+
+    setSkin(skinName) {
+        this.skin = SKINS[skinName];
+        this.draw();
+        
+        // Update body bg for immersive feel
+        if (skinName === 'tech') document.body.style.background = '#121212';
+        else if (skinName === 'ink') document.body.style.background = '#e6e2d3';
+        else document.body.style.background = '#f0f0f0';
+    }
+
+    resize() {
+        const wrapper = document.getElementById('canvas-wrapper');
+        // Get the available space in the wrapper
+        const availWidth = wrapper.clientWidth;
+        const availHeight = wrapper.clientHeight;
+        
+        // Make the board as large as possible while maintaining 1:1 aspect ratio
+        const size = Math.min(availWidth, availHeight) * 0.95; // 95% of the smaller dimension
+        
+        // High DPI support
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.width = size * dpr;
+        this.canvas.height = size * dpr;
+        
+        // Set CSS size
+        this.canvas.style.width = size + 'px';
+        this.canvas.style.height = size + 'px';
+        
+        this.ctx.scale(dpr, dpr);
+        
+        this.padding = size * 0.05;
+        this.cellSize = (size - 2 * this.padding) / (BOARD_SIZE - 1);
+    }
+
+    draw() {
+        const { width, height } = this.canvas;
+        const size = parseFloat(this.canvas.style.width); // Logical size
+        
+        // Fill Background
+        this.ctx.fillStyle = this.skin.bg;
+        this.ctx.fillRect(0, 0, size, size);
+
+        // Draw Wood Grain Texture (Optional simple noise)
+        if (this.skin.name === 'wood') {
+             this.ctx.globalAlpha = 0.03;
+             // Simple noise
+             for(let i=0; i<5000; i++) {
+                 this.ctx.fillStyle = '#000';
+                 this.ctx.fillRect(Math.random()*size, Math.random()*size, 2, 2);
+             }
+             this.ctx.globalAlpha = 1.0;
+        }
+
+        // Draw Border (Board Outline)
+        this.ctx.strokeStyle = this.skin.border || this.skin.grid;
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeRect(this.padding - 5, this.padding - 5, size - 2*this.padding + 10, size - 2*this.padding + 10);
+
+        // Draw Grid
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = this.skin.grid;
+        this.ctx.lineWidth = 1.5; // Slightly thicker grid for visibility
+
+        for (let i = 0; i < BOARD_SIZE; i++) {
+            const p = this.padding + i * this.cellSize;
+            // Vertical
+            this.ctx.moveTo(p, this.padding);
+            this.ctx.lineTo(p, size - this.padding);
+            // Horizontal
+            this.ctx.moveTo(this.padding, p);
+            this.ctx.lineTo(size - this.padding, p);
+        }
+        this.ctx.stroke();
+
+        // Star points (3, 7, 11) - more visible
+        const stars = [3, 7, 11];
+        this.ctx.fillStyle = this.skin.grid;
+        for (let r of stars) {
+            for (let c of stars) {
+                const x = this.padding + c * this.cellSize;
+                const y = this.padding + r * this.cellSize;
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, 4, 0, Math.PI * 2); // Larger star points
+                this.ctx.fill();
+            }
+        }
+
+        // Draw Pieces with improved realism
+        for (let y = 0; y < BOARD_SIZE; y++) {
+            for (let x = 0; x < BOARD_SIZE; x++) {
+                if (this.game.board[y][x] !== EMPTY) {
+                    this.drawPiece(x, y, this.game.board[y][x]);
+                }
+            }
+        }
+
+        // Draw Last Move Marker
+        const lastMove = this.game.history[this.game.history.length - 1];
+        if (lastMove) {
+            const cx = this.padding + lastMove.x * this.cellSize;
+            const cy = this.padding + lastMove.y * this.cellSize;
+            
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = this.skin.lastMove;
+            this.ctx.lineWidth = 3;
+            // Draw a small cross or target
+            this.ctx.moveTo(cx - 5, cy);
+            this.ctx.lineTo(cx + 5, cy);
+            this.ctx.moveTo(cx, cy - 5);
+            this.ctx.lineTo(cx, cy + 5);
+            this.ctx.stroke();
+        }
+
+        // Draw Winning Line & Effect
+        if (this.game.winningLine) {
+            this.ctx.save();
+            
+            // Glow effect for stones
+            this.ctx.shadowBlur = 25;
+            this.ctx.shadowColor = this.skin.winLine;
+            this.ctx.fillStyle = this.skin.winLine; 
+            
+            for (let pos of this.game.winningLine) {
+                const cx = this.padding + pos.x * this.cellSize;
+                const cy = this.padding + pos.y * this.cellSize;
+                
+                // Draw a ring or glow around the piece
+                this.ctx.beginPath();
+                this.ctx.arc(cx, cy, this.cellSize * 0.48, 0, Math.PI * 2);
+                this.ctx.strokeStyle = this.skin.winLine;
+                this.ctx.lineWidth = 4;
+                this.ctx.stroke();
+            }
+            this.ctx.restore();
+
+            // Draw connecting line
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = this.skin.winLine;
+            this.ctx.lineWidth = 6;
+            this.ctx.lineCap = 'round';
+            this.ctx.globalAlpha = 0.8;
+            
+            const first = this.game.winningLine[0];
+            const last = this.game.winningLine[this.game.winningLine.length - 1];
+            
+            this.ctx.moveTo(this.padding + first.x * this.cellSize, this.padding + first.y * this.cellSize);
+            this.ctx.lineTo(this.padding + last.x * this.cellSize, this.padding + last.y * this.cellSize);
+            this.ctx.stroke();
+            this.ctx.globalAlpha = 1.0;
+        }
+    }
+
+    drawPiece(x, y, player) {
+        const cx = this.padding + x * this.cellSize;
+        const cy = this.padding + y * this.cellSize;
+        const r = this.cellSize * 0.44; // Slightly larger pieces
+
+        const config = player === BLACK ? this.skin.blackPiece : this.skin.whitePiece;
+
+        // 1. Shadow (Drop shadow)
+        this.ctx.beginPath();
+        this.ctx.arc(cx + 2, cy + 3, r, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        this.ctx.fill();
+
+        // 2. Rim/Glow (for tech skin or definition)
+        if (config.rim) {
+             this.ctx.beginPath();
+             this.ctx.arc(cx, cy, r + 1, 0, Math.PI * 2);
+             this.ctx.fillStyle = config.rim;
+             this.ctx.fill();
+        }
+
+        // 3. Main Body
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        
+        // Complex gradient for 3D sphere look
+        // Light comes from top-left usually
+        const grad = this.ctx.createRadialGradient(
+            cx - r*0.3, cy - r*0.3, r * 0.05,
+            cx, cy, r
+        );
+        grad.addColorStop(0, config.highlight); // Specular highlight
+        grad.addColorStop(0.3, config.color);   // Base color
+        grad.addColorStop(1, '#000000'); // Shadow edge (mix with color)
+        
+        // Use a second gradient for the color itself to avoid pure black edge if needed
+        // Simulating material
+        
+        this.ctx.fillStyle = grad;
+        this.ctx.fill();
+
+        // 4. Inner Glow / Reflection (Subsurface scattering simulation for white/jade)
+        if (player === WHITE || this.skin.name === 'wood') {
+            this.ctx.beginPath();
+            this.ctx.arc(cx, cy, r * 0.9, 0, Math.PI * 2);
+            const innerGrad = this.ctx.createRadialGradient(
+                cx - r*0.2, cy - r*0.2, 0,
+                cx - r*0.2, cy - r*0.2, r * 1.5
+            );
+            innerGrad.addColorStop(0, config.glow); 
+            innerGrad.addColorStop(1, 'transparent');
+            
+            this.ctx.fillStyle = innerGrad;
+            this.ctx.fill();
+        }
+    }
+    
+    getCoordFromEvent(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        // Handle touch and mouse
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        
+        const scale = parseFloat(this.canvas.style.width) / rect.width; // Should be 1 typically
+        
+        const gridX = Math.round((x * scale - this.padding) / this.cellSize);
+        const gridY = Math.round((y * scale - this.padding) / this.cellSize);
+        
+        return { x: gridX, y: gridY };
+    }
+}
+
+// --- Main Controller ---
+document.addEventListener('DOMContentLoaded', () => {
+    const game = new GomokuGame();
+    const ai = new GomokuAI(game);
+    const view = new GomokuView(game, 'board');
+    
+    // UI Elements
+    const statusText = document.getElementById('status-text');
+    const turnDot = document.getElementById('turn-dot');
+    const difficultySelect = document.getElementById('difficulty-select');
+    const skinSelect = document.getElementById('skin-select');
+    const soundBtn = document.getElementById('sound-toggle');
+    const undoBtn = document.getElementById('undo-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // State
+    let isThinking = false;
+
+    // Init Audio
+    AudioSys.init();
+
+    // Interaction
+    const handleInput = (e) => {
+        if (game.gameOver || isThinking || game.currentPlayer !== BLACK) return;
+        
+        // Init audio context on first user interaction if suspended
+        if (AudioSys.ctx && AudioSys.ctx.state === 'suspended') AudioSys.ctx.resume();
+
+        const { x, y } = view.getCoordFromEvent(e);
+        
+        if (game.makeMove(x, y)) {
+            AudioSys.playMove(true);
+            view.draw();
+            updateStatus();
+            
+            if (!game.gameOver) {
+                isThinking = true;
+                // Small delay for realism/UI render
+                setTimeout(() => {
+                    aiTurn();
+                }, 100); // 100ms delay min
+            } else {
+                handleWin();
+            }
+        }
+    };
+
+    view.canvas.addEventListener('mousedown', handleInput);
+    
+    function aiTurn() {
+        const move = ai.getBestMove();
+        if (move) {
+            game.makeMove(move.x, move.y);
+            AudioSys.playMove(false);
+            view.draw();
+            updateStatus();
+            
+            if (game.gameOver) {
+                handleWin();
+            }
+        }
+        isThinking = false;
+    }
+
+    function handleWin() {
+        const winnerText = game.winner === BLACK ? "玩家获胜!" : "AI 获胜!";
+        statusText.textContent = winnerText;
+        statusText.style.color = game.winner === BLACK ? '#d32f2f' : '#1976d2';
+        if (game.winner === BLACK) AudioSys.playWin();
+        else AudioSys.playLose();
+        updateUndoBtn(); // Disable undo if game over? No, allow undo to retry
+    }
+
+    function updateStatus() {
+        if (game.gameOver) return;
+        const isPlayer = game.currentPlayer === BLACK;
+        statusText.textContent = isPlayer ? "玩家思考中..." : "AI 思考中...";
+        statusText.style.color = '#333';
+        turnDot.style.background = isPlayer ? 'black' : 'white';
+        turnDot.style.border = isPlayer ? 'none' : '1px solid #999';
+        updateUndoBtn();
+    }
+    
+    function updateUndoBtn() {
+        const remaining = game.maxUndo - game.undoCount;
+        undoBtn.textContent = `悔棋 (${remaining})`;
+        // Disable if count 0 or no history or AI is thinking
+        if (remaining <= 0 || game.history.length < 2 || isThinking) {
+            undoBtn.style.opacity = 0.5;
+            undoBtn.style.cursor = 'not-allowed';
+        } else {
+            undoBtn.style.opacity = 1;
+            undoBtn.style.cursor = 'pointer';
+        }
+    }
+
+    // Controls
+    restartBtn.addEventListener('click', () => {
+        game.initBoard();
+        view.draw();
+        statusText.textContent = "玩家先手";
+        statusText.style.color = '#333';
+        isThinking = false;
+        updateUndoBtn();
+    });
+    
+    undoBtn.addEventListener('click', () => {
+        if (isThinking || game.undoCount >= game.maxUndo || game.history.length < 2) return;
+        
+        if (game.undo()) {
+            view.draw();
+            statusText.textContent = "玩家思考中..."; // Always player's turn
+            statusText.style.color = '#333';
+            isThinking = false;
+            updateUndoBtn();
+        }
+    });
+
+    difficultySelect.addEventListener('change', (e) => {
+        game.difficulty = e.target.value;
+        // Restart game on difficulty change to be fair
+        restartBtn.click();
+    });
+
+    skinSelect.addEventListener('change', (e) => {
+        view.setSkin(e.target.value);
+    });
+
+    soundBtn.addEventListener('click', () => {
+        AudioSys.enabled = !AudioSys.enabled;
+        soundBtn.textContent = AudioSys.enabled ? "🔊 音效开启" : "🔇 音效关闭";
+    });
+
+    // Initial Draw
+    view.draw();
+});
+</script>
+</body>
+</html>

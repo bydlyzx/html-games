@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THUNDER 2048: RAIDEN EDITION</title>
+    <style>
+        :root {
+            --bg-color: #050510;
+            --grid-bg: #111122;
+            --text-glow: 0 0 10px rgba(255, 255, 255, 0.8);
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff00;
+            --neon-red: #ff3333;
+            --neon-yellow: #ffff00;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            outline: none; /* 去除所有默认选中框 */
+            -webkit-tap-highlight-color: transparent; /* 去除移动端点击高亮 */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        /* ... */
+
+        #game-container {
+            position: relative;
+            z-index: 5;
+            width: 500px;
+            height: 500px;
+            background: rgba(10, 10, 25, 0.9); /* 加深背景 */
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.3), inset 0 0 30px rgba(0,0,0,0.8);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 15px;
+            padding: 15px;
+            margin: 20px auto;
+            transition: transform 0.05s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        /* 拖拽/操作时的激活状态 - 红色警戒轮廓 */
+        #game-container.dragging {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 30px var(--neon-red), inset 0 0 20px rgba(255, 0, 0, 0.3);
+            transform: scale(1.01);
+            cursor: grabbing;
+        }
+        
+        #game-container:active {
+            cursor: grabbing;
+        }
+
+        @media (max-width: 520px) {
+            #game-container { width: 90vw; height: 90vw; gap: 10px; padding: 10px; }
+        }
+
+        /* 棋盘格子背景 - 增强可见度 */
+        .grid-cell {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+        }
+
+        /* 动态方块 - 增强实体感 */
+        .tile {
+            position: absolute;
+            /* 尺寸由 JS 动态计算 */
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            border: 2px solid white;
+            border-radius: 6px;
+            transition: transform 0.1s ease-in-out, opacity 0.1s, left 0.1s ease-in-out, top 0.1s ease-in-out;
+            z-index: 2;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5); /* 基础阴影 */
+        }
+
+        /* 敌人等级颜色 - 增加内部填充和更强的光效 */
+        .tile-2 { 
+            border-color: #eee; color: #fff; 
+            background: linear-gradient(135deg, rgba(238,238,238,0.1), rgba(238,238,238,0));
+            box-shadow: 0 0 10px rgba(238,238,238,0.3), inset 0 0 5px rgba(238,238,238,0.2); 
+        }
+        .tile-4 { 
+            border-color: #aaffff; color: #fff; 
+            background: linear-gradient(135deg, rgba(170,255,255,0.15), rgba(170,255,255,0));
+            box-shadow: 0 0 12px rgba(170,255,255,0.4), inset 0 0 5px rgba(170,255,255,0.3); 
+        }
+        .tile-8 { 
+            border-color: #00ddff; color: #fff; 
+            background: linear-gradient(135deg, rgba(0,221,255,0.2), rgba(0,221,255,0));
+            box-shadow: 0 0 15px rgba(0,221,255,0.5), inset 0 0 10px rgba(0,221,255,0.2); 
+        }
+        .tile-16 { 
+            border-color: #0099ff; color: #fff; 
+            background: linear-gradient(135deg, rgba(0,153,255,0.25), rgba(0,153,255,0));
+            box-shadow: 0 0 18px rgba(0,153,255,0.6), inset 0 0 12px rgba(0,153,255,0.25); 
+        }
+        .tile-32 { 
+            border-color: #00ff99; color: #fff; 
+            background: linear-gradient(135deg, rgba(0,255,153,0.3), rgba(0,255,153,0));
+            box-shadow: 0 0 20px rgba(0,255,153,0.6), inset 0 0 15px rgba(0,255,153,0.3); 
+        }
+        .tile-64 { 
+            border-color: #00ff00; color: #fff; 
+            background: linear-gradient(135deg, rgba(0,255,0,0.35), rgba(0,255,0,0));
+            box-shadow: 0 0 25px rgba(0,255,0,0.7), inset 0 0 15px rgba(0,255,0,0.3); 
+        }
+        .tile-128 { 
+            border-color: #ffff00; color: #fff; 
+            background: linear-gradient(135deg, rgba(255,255,0,0.4), rgba(255,255,0,0));
+            box-shadow: 0 0 30px rgba(255,255,0,0.8), inset 0 0 20px rgba(255,255,0,0.4); 
+            animation: pulse 1.5s infinite; 
+        }
+        .tile-256 { 
+            border-color: #ff9900; color: #fff; 
+            background: linear-gradient(135deg, rgba(255,153,0,0.45), rgba(255,153,0,0));
+            box-shadow: 0 0 35px rgba(255,153,0,0.8), inset 0 0 25px rgba(255,153,0,0.45); 
+            animation: pulse 1.2s infinite; 
+        }
+        .tile-512 { 
+            border-color: #ff3333; color: #fff; 
+            background: linear-gradient(135deg, rgba(255,51,51,0.5), rgba(255,51,51,0));
+            box-shadow: 0 0 40px rgba(255,51,51,0.9), inset 0 0 30px rgba(255,51,51,0.5); 
+            animation: shake 2s infinite; 
+        }
+        .tile-1024 { 
+            border-color: #ff00ff; color: #fff; 
+            background: linear-gradient(135deg, rgba(255,0,255,0.55), rgba(255,0,255,0));
+            box-shadow: 0 0 45px rgba(255,0,255,0.9), inset 0 0 35px rgba(255,0,255,0.55); 
+            animation: shake 1.5s infinite; 
+        }
+        .tile-2048 { 
+            border-color: #ffffff; color: #fff; 
+            background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0));
+            box-shadow: 0 0 60px rgba(255,255,255,1), inset 0 0 40px rgba(255,255,255,0.6); 
+            animation: rainbow 0.5s infinite; 
+        }
+
+        /* 特效层 */
+        #fx-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 20;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 状态栏 & 技能 */
+        #status-bar {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            z-index: 10;
+        }
+
+        .skill-btn {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #555;
+            color: #555;
+            padding: 10px 15px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-btn.active {
+            border-color: var(--neon-red);
+            color: white;
+            box-shadow: 0 0 15px var(--neon-red);
+            animation: pulse-red 1s infinite;
+        }
+        
+        .skill-btn.active:active {
+            transform: scale(0.95);
+        }
+
+        .combo-text {
+            position: absolute;
+            font-size: 40px;
+            font-weight: 900;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 20px var(--neon-red);
+            pointer-events: none;
+            z-index: 30;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        /* Overlay */
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        #overlay h1 {
+            font-size: 48px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 20px var(--neon-blue);
+            margin-bottom: 20px;
+        }
+        #start-btn {
+            padding: 15px 40px;
+            font-size: 24px;
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--neon-green);
+            font-family: inherit;
+        }
+        #start-btn:hover { background: var(--neon-green); color: black; }
+
+        /* 动画关键帧 */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 10px var(--neon-red); } 50% { box-shadow: 0 0 25px var(--neon-red); } 100% { box-shadow: 0 0 10px var(--neon-red); } }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 25% { transform: translate(-1px, -2px); } 50% { transform: translate(-3px, 0px); } 75% { transform: translate(3px, 2px); } 100% { transform: translate(1px, -1px); } }
+        @keyframes rainbow { 0% { border-color: red; box-shadow: 0 0 20px red; } 33% { border-color: lime; box-shadow: 0 0 20px lime; } 66% { border-color: blue; box-shadow: 0 0 20px blue; } 100% { border-color: red; box-shadow: 0 0 20px red; } }
+
+        .screen-shake { animation: shake 0.2s; }
+        .tile-new { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .tile-merged { animation: popMerge 0.2s ease-out; z-index: 10; }
+        
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes popMerge { 0% { transform: scale(1); } 50% { transform: scale(1.3); filter: brightness(2); } 100% { transform: scale(1); } }
+
+        .hidden { display: none !important; }
+        
+        #controls-hint {
+            margin-top: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanline"></div>
+    <canvas id="fx-canvas"></canvas>
+
+    <div id="ui-layer">
+        <div class="score-box">
+            <div class="score-label">SCORE</div>
+            <div class="score-value" id="score">0</div>
+        </div>
+        <div class="score-box">
+            <div class="score-label">BEST</div>
+            <div class="score-value" id="best-score">0</div>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <!-- Grid cells generated by JS -->
+    </div>
+
+    <div id="status-bar">
+        <button id="skill-bomb" class="skill-btn">充能轰炸 (0%)</button>
+        <button id="skill-undo" class="skill-btn">时光倒流</button>
+    </div>
+
+    <div id="game-intro" style="max-width: 500px; margin: 10px auto; color: #aaa; font-size: 14px; line-height: 1.6; background: rgba(0,0,0,0.5); padding: 15px; border: 1px solid #333;">
+        <h3 style="color: var(--neon-blue); margin-top: 0; text-align: center;">⚡ 作战指南</h3>
+        <ul style="padding-left: 20px; margin: 0;">
+            <li><strong>移动攻击：</strong>使用 <span style="color:white">方向键</span> 或 <span style="color:white">鼠标/手指拖拽</span> 移动所有单位。</li>
+            <li><strong>合成进化：</strong>相同数字碰撞会升级并引发爆炸。</li>
+            <li><strong>充能轰炸：</strong>消除积累能量，满槽后按 <span style="color:var(--neon-red)">SPACE 空格</span> 或点击按钮，瞬间消灭5个最弱敌人。</li>
+            <li><strong>连击加成：</strong>一次操作多次合成触发 COMBO，分数倍增！</li>
+        </ul>
+    </div>
+
+    <div id="combo-display" class="combo-text">COMBO!</div>
+
+    <div id="overlay">
+        <h1>雷电 2048<br><span style="font-size: 24px; color:white;">THUNDER EDITION</span></h1>
+        <p style="margin-bottom: 30px; color: #aaa;">合成 · 爆炸 · 存活</p>
+        <button id="start-btn">开始作战</button>
+    </div>
+
+    <script>
+        /**
+         * THUNDER 2048 - RAIDEN EDITION
+         * Single File Implementation
+         */
+
+        // --- AUDIO ENGINE (Web Audio API) ---
+        class AudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = false;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    this.enabled = true;
+                    this.playStartupSound();
+                } else if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playTone(freq, type, duration, vol = 0.1) {
+                if (!this.enabled) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            }
+
+            playNoise(duration, vol = 0.2) {
+                if (!this.enabled) return;
+                const bufferSize = this.ctx.sampleRate * duration;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                
+                // Add Lowpass filter for "explosion" thud
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 1000;
+                filter.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + duration);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                noise.start();
+            }
+
+            playMove() { this.playTone(600, 'square', 0.1, 0.05); }
+            playMerge(val) {
+                // Higher value = Lower pitch explosion + Higher volume
+                const pitch = Math.max(100, 800 - (Math.log2(val) * 50));
+                this.playTone(pitch, 'sawtooth', 0.2, 0.1);
+                this.playNoise(0.3, 0.2 + (Math.log2(val) * 0.02));
+            }
+            playCombo(count) {
+                // Ascending arpeggio
+                const base = 440;
+                this.playTone(base * (1 + count * 0.2), 'square', 0.3, 0.1);
+            }
+            playBomb() {
+                this.playNoise(0.8, 0.5);
+                this.playTone(100, 'sawtooth', 1.0, 0.5);
+            }
+            playStartupSound() {
+                this.playTone(440, 'square', 0.1, 0.1);
+                setTimeout(() => this.playTone(880, 'square', 0.2, 0.1), 100);
+                setTimeout(() => this.playNoise(0.5, 0.3), 300);
+            }
+            playGameOver() {
+                this.playTone(100, 'sawtooth', 2.0, 0.3);
+                this.playNoise(1.0, 0.3);
+            }
+        }
+
+        // --- PARTICLE SYSTEM ---
+        class ParticleSystem {
+            constructor() {
+                this.canvas = document.getElementById('fx-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                this.loop();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createExplosion(x, y, color, count = 10) {
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 5 + 2;
+                    this.particles.push({
+                        x: x, y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 1.0,
+                        color: color,
+                        size: Math.random() * 4 + 2
+                    });
+                }
+            }
+
+            loop() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    let p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.02;
+                    p.vy += 0.1; // Gravity (optional)
+
+                    if (p.life <= 0) {
+                        this.particles.splice(i, 1);
+                    } else {
+                        this.ctx.globalAlpha = p.life;
+                        this.ctx.fillStyle = p.color;
+                        this.ctx.fillRect(p.x, p.y, p.size, p.size);
+                    }
+                }
+                this.ctx.globalAlpha = 1;
+                requestAnimationFrame(() => this.loop());
+            }
+        }
+
+        // --- GAME LOGIC ---
+        class Game {
+            constructor() {
+                this.gridSize = 4;
+                this.grid = [];
+                this.score = 0;
+                this.bestScore = localStorage.getItem('thunder2048_best') || 0;
+                this.container = document.getElementById('game-container');
+                this.audio = new AudioEngine();
+                this.fx = new ParticleSystem();
+                
+                // Raiden Features
+                this.combo = 0;
+                this.bombCharge = 0;
+                this.maxBombCharge = 1000; // Points to get bomb
+                this.undoStack = []; // State history
+                
+                this.setupInput();
+                this.initGrid();
+                this.updateScore(0);
+                this.render();
+                
+                document.getElementById('start-btn').addEventListener('click', () => {
+                    this.audio.init();
+                    document.getElementById('overlay').classList.add('hidden');
+                    this.restart();
+                });
+
+                document.getElementById('skill-bomb').addEventListener('click', () => this.triggerBomb());
+                document.getElementById('skill-undo').addEventListener('click', () => this.triggerUndo());
+            }
+
+            restart() {
+                this.grid = Array(16).fill(0);
+                this.score = 0;
+                this.bombCharge = 0;
+                this.combo = 0;
+                this.undoStack = [];
+                this.updateScore(0);
+                this.updateBombBtn();
+                
+                // Clear UI
+                this.container.innerHTML = '';
+                // Add background cells
+                for(let i=0; i<16; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    this.container.appendChild(cell);
+                }
+                
+                // Re-calculate layout immediately on start/restart to ensure correct sizing
+                this.render();
+
+                this.addRandomTile();
+                this.addRandomTile();
+                this.render();
+            }
+
+            initGrid() {
+                // Initial grid cells creation
+                for(let i=0; i<16; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    this.container.appendChild(cell);
+                }
+            }
+
+            // --- CORE 2048 LOGIC ---
+
+            getEmptyCells() {
+                return this.grid.map((val, idx) => val === 0 ? idx : -1).filter(idx => idx !== -1);
+            }
+
+            addRandomTile() {
+                const empty = this.getEmptyCells();
+                if (empty.length > 0) {
+                    const idx = empty[Math.floor(Math.random() * empty.length)];
+                    this.grid[idx] = Math.random() < 0.9 ? 2 : 4;
+                    this.renderTile(idx, this.grid[idx], 'new');
+                }
+            }
+
+            saveState() {
+                if (this.undoStack.length > 3) this.undoStack.shift(); // Keep last 3 moves
+                this.undoStack.push({
+                    grid: [...this.grid],
+                    score: this.score,
+                    bomb: this.bombCharge
+                });
+            }
+
+            move(direction) {
+                // 0: Up, 1: Right, 2: Down, 3: Left
+                this.saveState();
+
+                let moved = false;
+                let mergedTiles = []; // Track merges for FX
+                let moveScore = 0;
+                let comboCount = 0;
+
+                const rotateGrid = (g) => {
+                    // Rotate 90 degrees clockwise
+                    const newG = Array(16).fill(0);
+                    for(let r=0; r<4; r++) {
+                        for(let c=0; c<4; c++) {
+                            newG[c*4 + (3-r)] = g[r*4 + c];
+                        }
+                    }
+                    return newG;
+                };
+
+                // Standardize to "Left" movement by rotating
+                let workingGrid = [...this.grid];
+                // Rotate to make direction point Left (3)
+                // Up(0) -> 3 rots, Right(1) -> 2 rots, Down(2) -> 1 rot, Left(3) -> 0 rots
+                let rotations = (4 - (direction - 3)) % 4; 
+                // Wait, simpler:
+                // Up (0): Rotate 270 (3 times) -> Left
+                // Right (1): Rotate 180 (2 times) -> Left
+                // Down (2): Rotate 90 (1 time) -> Left
+                // Left (3): Rotate 0 -> Left
+                
+                // Correction:
+                // If I want to move UP. I rotate grid 270 deg (counter clockwise) or 90 deg (clockwise 3 times).
+                // Let's use specific row processing for reliability.
+                
+                // Logic: Extract lines, process, put back.
+                let lines = [];
+                if (direction === 0 || direction === 2) { // Up/Down (Cols)
+                    for(let c=0; c<4; c++) lines.push([this.grid[c], this.grid[c+4], this.grid[c+8], this.grid[c+12]]);
+                } else { // Left/Right (Rows)
+                    for(let r=0; r<4; r++) lines.push([this.grid[r*4], this.grid[r*4+1], this.grid[r*4+2], this.grid[r*4+3]]);
+                }
+
+                if (direction === 2 || direction === 1) { // Down or Right: Reverse lines to process as standard
+                    lines = lines.map(line => line.reverse());
+                }
+
+                // Process lines
+                lines.forEach((line, lineIdx) => {
+                    // 1. Remove zeros
+                    let filtered = line.filter(v => v !== 0);
+                    // 2. Merge
+                    for(let i=0; i < filtered.length - 1; i++) {
+                        if (filtered[i] === filtered[i+1]) {
+                            filtered[i] *= 2;
+                            moveScore += filtered[i];
+                            comboCount++;
+                            mergedTiles.push({ val: filtered[i], lineIdx, pos: i }); // Abstract pos
+                            
+                            // Trigger Particle Explosion for Merge
+                            // We need to calculate the screen position. 
+                            // Since we are in the logic loop, we approximate or defer.
+                            // Better to defer FX to render or calculate here based on indices.
+                            // Let's defer by storing the "merged index" which is tricky during reduction.
+                            
+                            filtered.splice(i+1, 1);
+                        }
+                    }
+                    // 3. Pad zeros
+                    while(filtered.length < 4) filtered.push(0);
+                    
+                    if (direction === 2 || direction === 1) filtered.reverse(); // Reverse back
+
+                    // Check change
+                    if (filtered.join(',') !== line.join(',')) moved = true;
+                    
+                    lines[lineIdx] = filtered;
+                });
+
+                if (!moved) {
+                    this.undoStack.pop(); // Revert save
+                    return;
+                }
+
+                // Write back
+                if (direction === 0 || direction === 2) {
+                    for(let c=0; c<4; c++) {
+                        this.grid[c] = lines[c][0];
+                        this.grid[c+4] = lines[c][1];
+                        this.grid[c+8] = lines[c][2];
+                        this.grid[c+12] = lines[c][3];
+                    }
+                } else {
+                    for(let r=0; r<4; r++) {
+                        this.grid[r*4] = lines[r][0];
+                        this.grid[r*4+1] = lines[r][1];
+                        this.grid[r*4+2] = lines[r][2];
+                        this.grid[r*4+3] = lines[r][3];
+                    }
+                }
+
+                // --- POST MOVE LOGIC ---
+                this.audio.playMove();
+                
+                if (comboCount > 0) {
+                    this.combo += comboCount;
+                    this.handleCombo(this.combo);
+                    this.audio.playMerge(moveScore / comboCount);
+                    this.triggerShake();
+                    
+                    // Trigger Explosions for all merged tiles (Visual approximation)
+                    // Simply spawn random explosions on the board for the "Warzone" feel
+                    for(let k=0; k<comboCount; k++) {
+                        const rect = this.container.getBoundingClientRect();
+                        const exX = rect.left + Math.random() * rect.width;
+                        const exY = rect.top + Math.random() * rect.height;
+                        this.fx.createExplosion(exX, exY, '#ffff00', 15);
+                    }
+                    
+                    // Bomb Charge
+                    this.bombCharge += moveScore;
+                    if (this.bombCharge > this.maxBombCharge) this.bombCharge = this.maxBombCharge;
+                    this.updateBombBtn();
+                } else {
+                    this.combo = 0; // Reset combo if no merge
+                    document.getElementById('combo-display').style.opacity = 0;
+                }
+
+                this.updateScore(this.score + moveScore);
+                this.render(); // Render moved state
+                
+                // Add new tile after short delay for animation (simulated here by immediate)
+                setTimeout(() => {
+                    this.addRandomTile();
+                    // Check Game Over
+                    if (this.isGameOver()) {
+                        this.audio.playGameOver();
+                        alert("MISSION FAILED. SCORE: " + this.score);
+                    }
+                }, 100);
+            }
+
+            // --- RAIDEN / ARCADE MECHANICS ---
+
+            triggerShake() {
+                this.container.classList.remove('screen-shake');
+                void this.container.offsetWidth; // trigger reflow
+                this.container.classList.add('screen-shake');
+            }
+
+            handleCombo(count) {
+                const el = document.getElementById('combo-display');
+                if (count > 1) {
+                    el.innerText = count + " HIT COMBO!";
+                    el.style.opacity = 1;
+                    el.style.top = (50 + Math.random() * 20) + '%';
+                    el.style.left = (10 + Math.random() * 20) + '%';
+                    el.style.transform = `scale(${1 + count*0.1}) rotate(${Math.random()*20-10}deg)`;
+                    this.audio.playCombo(count);
+                }
+            }
+
+            updateBombBtn() {
+                const btn = document.getElementById('skill-bomb');
+                const pct = Math.floor((this.bombCharge / this.maxBombCharge) * 100);
+                btn.innerText = `BOMB (${pct}%)`;
+                if (pct >= 100) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            }
+
+            triggerBomb() {
+                if (this.bombCharge < this.maxBombCharge) return;
+                
+                this.saveState();
+                this.bombCharge = 0;
+                this.updateBombBtn();
+                this.audio.playBomb();
+                this.triggerShake();
+
+                // Effect: Clear 5 lowest value non-zero tiles
+                let tiles = this.grid.map((v, i) => ({v, i})).filter(t => t.v > 0);
+                tiles.sort((a, b) => a.v - b.v); // Ascending
+                
+                let targets = tiles.slice(0, 5); // Take up to 5 smallest
+                targets.forEach(t => {
+                    this.grid[t.i] = 0;
+                    // FX
+                    const cell = this.container.children[t.i];
+                    const rect = cell.getBoundingClientRect();
+                    this.fx.createExplosion(rect.left + rect.width/2, rect.top + rect.height/2, '#ff0000', 20);
+                });
+                
+                this.render();
+            }
+
+            triggerUndo() {
+                if (this.undoStack.length > 0) {
+                    const state = this.undoStack.pop();
+                    this.grid = state.grid;
+                    this.score = state.score;
+                    this.bombCharge = state.bomb;
+                    this.updateScore(this.score);
+                    this.updateBombBtn();
+                    this.render();
+                    this.audio.playTone(200, 'sine', 0.5); // Reverse sound
+                }
+            }
+
+            isGameOver() {
+                if (this.getEmptyCells().length > 0) return false;
+                // Check neighbors
+                for(let i=0; i<16; i++) {
+                    const val = this.grid[i];
+                    const r = Math.floor(i/4);
+                    const c = i%4;
+                    if (c<3 && val === this.grid[i+1]) return false;
+                    if (r<3 && val === this.grid[i+4]) return false;
+                }
+                return true;
+            }
+
+            updateScore(newScore) {
+                this.score = newScore;
+                document.getElementById('score').innerText = this.score;
+                if (this.score > this.bestScore) {
+                    this.bestScore = this.score;
+                    localStorage.setItem('thunder2048_best', this.bestScore);
+                }
+                document.getElementById('best-score').innerText = this.bestScore;
+            }
+
+            // --- RENDERING ---
+            
+            render() {
+                // Remove existing tiles
+                const existingTiles = document.querySelectorAll('.tile');
+                existingTiles.forEach(t => t.remove());
+
+                // Render new tiles
+                this.grid.forEach((val, idx) => {
+                    if (val === 0) return;
+                    this.renderTile(idx, val);
+                });
+            }
+
+            renderTile(idx, val, animClass = '') {
+                const tile = document.createElement('div');
+                tile.className = `tile tile-${val} ${animClass}`;
+                tile.innerText = val;
+                
+                const r = Math.floor(idx / 4);
+                const c = idx % 4;
+                
+                // Calculate position based on container size (approximate for simplicity in single file)
+                // Container is 350px. Gap 10px. Cell approx (350 - 50)/4 = 75px.
+                // Or utilize percentages.
+                // Left: 10px + c * (25%) ... wait.
+                // CSS uses grid gap 10px.
+                // Let's rely on absolute positioning percentages which is robust.
+                // gap is 10px. 4 cols.
+                // Position logic: 
+                // gap + (cell + gap) * c
+                // But simplified: 
+                
+                // Better approach: append to specific grid cell? No, animation needs absolute.
+                // Let's use precise % based on standard 2048 CSS logic.
+                // cell size = ~21.25%. Gap = ~3.75% (approx)
+                
+                // Dynamic sizing logic
+                const compStyle = window.getComputedStyle(this.container);
+                const gap = parseFloat(compStyle.gap) || 10;
+                const padding = parseFloat(compStyle.padding) || 10;
+                
+                // Calculate cell size: (Width - 2*Padding - 3*Gap) / 4
+                const availableWidth = this.container.clientWidth - (2 * padding) - (3 * gap);
+                const size = availableWidth / 4;
+                
+                const left = padding + c * (size + gap);
+                const top = padding + r * (size + gap);
+                
+                tile.style.left = left + 'px';
+                tile.style.top = top + 'px';
+                tile.style.width = size + 'px';
+                tile.style.height = size + 'px';
+                
+                // Adjust font size for smaller screens or large numbers
+                if (size < 60) tile.style.fontSize = '20px';
+                else if (size < 80) tile.style.fontSize = '24px';
+                else tile.style.fontSize = '32px';
+
+                this.container.appendChild(tile);
+
+                // FX for High Tiles
+                if (val >= 64) {
+                   const rect = tile.getBoundingClientRect(); // Wait, this might be 0 if not attached? No it is.
+                   // Actually we need screen coords for canvas
+                   // Postpone FX to next frame or use calculated coords
+                }
+            }
+            
+            setupInput() {
+                window.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowUp') this.move(0);
+                    else if (e.key === 'ArrowRight') this.move(1);
+                    else if (e.key === 'ArrowDown') this.move(2);
+                    else if (e.key === 'ArrowLeft') this.move(3);
+                    else if (e.key === ' ') this.triggerBomb();
+                });
+
+                // Swipe support (Touch)
+                let touchStart = {x:0, y:0};
+                this.container.addEventListener('touchstart', (e) => {
+                    this.container.classList.add('dragging');
+                    touchStart.x = e.touches[0].clientX;
+                    touchStart.y = e.touches[0].clientY;
+                    e.preventDefault(); // Prevent scroll
+                }, {passive: false});
+
+                this.container.addEventListener('touchend', (e) => {
+                    this.container.classList.remove('dragging');
+                    const dx = e.changedTouches[0].clientX - touchStart.x;
+                    const dy = e.changedTouches[0].clientY - touchStart.y;
+                    this.handleSwipe(dx, dy);
+                });
+
+                // Mouse Drag support
+                let isDragging = false;
+                let mouseStart = {x:0, y:0};
+
+                this.container.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    this.container.classList.add('dragging');
+                    mouseStart.x = e.clientX;
+                    mouseStart.y = e.clientY;
+                    e.preventDefault();
+                });
+
+                window.addEventListener('mouseup', (e) => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    this.container.classList.remove('dragging');
+                    const dx = e.clientX - mouseStart.x;
+                    const dy = e.clientY - mouseStart.y;
+                    this.handleSwipe(dx, dy);
+                });
+            }
+
+            handleSwipe(dx, dy) {
+                const absDx = Math.abs(dx);
+                const absDy = Math.abs(dy);
+
+                if (Math.max(absDx, absDy) > 30) {
+                    if (absDx > absDy) {
+                        this.move(dx > 0 ? 1 : 3);
+                    } else {
+                        this.move(dy > 0 ? 2 : 0);
+                    }
+                }
+            }
+        }
+
+        // Init
+        window.onload = () => {
+            const game = new Game();
+        };
+
+    </script>
+</body>
+</html>

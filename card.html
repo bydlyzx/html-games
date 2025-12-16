@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>中英文单词消消乐</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <style>
+    /* ===== 基础布局与排版 ===== */
+    :root {
+      --bg-color: #f5f7fb;
+      --bg-color-soft: #eef2fa;
+      --card-bg: #ffffff;
+      --card-text-color: #222222;
+      --accent-color: #4a90e2;
+      --accent-soft: #8ab4f8;
+      --accent-strong: #2f6bc5;
+      --danger-color: #e57373;
+      --text-secondary: #666a78;
+      --border-radius: 18px;
+      --card-shadow: 0 8px 20px rgba(15, 35, 80, 0.08);
+      --card-shadow-strong: 0 10px 26px rgba(15, 35, 80, 0.16);
+      --transition-fast: 0.16s ease-out;
+      --transition-med: 0.25s ease-out;
+      --card-en-bg: linear-gradient(145deg, #fdfdff, #e3f0ff);
+      --card-zh-bg: linear-gradient(145deg, #fefcf7, #f4efe2);
+      --card-en-text: #1c2838;
+      --card-zh-text: #33251a;
+      --card-border-color: rgba(0, 0, 0, 0.04);
+    }
+
+    body.skin-red {
+      --bg-color: #fff5f5;
+      --bg-color-soft: #ffe4e4;
+      --card-bg: #ffffff;
+      --card-text-color: #3b1c1c;
+      --accent-color: #e85b5b;
+      --accent-soft: #f5a3a3;
+      --accent-strong: #d72f4b;
+      --text-secondary: #7b4b4b;
+      --card-shadow: 0 8px 20px rgba(170, 60, 60, 0.18);
+      --card-shadow-strong: 0 10px 26px rgba(170, 60, 60, 0.28);
+      --card-en-bg: linear-gradient(145deg, #fff0f2, #ffd5dc);
+      --card-zh-bg: linear-gradient(145deg, #fff9f5, #ffe5dd);
+      --card-en-text: #3b151b;
+      --card-zh-text: #3b1c1c;
+      --card-border-color: rgba(220, 120, 135, 0.4);
+    }
+
+    body.skin-orange {
+      --bg-color: #fff7ec;
+      --bg-color-soft: #ffe7cc;
+      --card-bg: #fffdf7;
+      --card-text-color: #3b2614;
+      --accent-color: #f29b4b;
+      --accent-soft: #f6bf7a;
+      --accent-strong: #e6762b;
+      --text-secondary: #8a6440;
+      --card-shadow: 0 8px 20px rgba(196, 124, 56, 0.18);
+      --card-shadow-strong: 0 10px 26px rgba(196, 124, 56, 0.3);
+      --card-en-bg: linear-gradient(145deg, #fff3e0, #ffd9ae);
+      --card-zh-bg: linear-gradient(145deg, #fff9ec, #ffe7c6);
+      --card-en-text: #3d2712;
+      --card-zh-text: #3b2614;
+      --card-border-color: rgba(220, 150, 90, 0.42);
+    }
+
+    body.skin-yellow {
+      --bg-color: #fffbe6;
+      --bg-color-soft: #fff3b8;
+      --card-bg: #fffef5;
+      --card-text-color: #3a3214;
+      --accent-color: #f2c94c;
+      --accent-soft: #ffe27a;
+      --accent-strong: #e0a81f;
+      --text-secondary: #85763a;
+      --card-shadow: 0 8px 20px rgba(191, 153, 40, 0.16);
+      --card-shadow-strong: 0 10px 26px rgba(191, 153, 40, 0.26);
+      --card-en-bg: linear-gradient(145deg, #fff9da, #ffeaa8);
+      --card-zh-bg: linear-gradient(145deg, #fffdf0, #fff0c4);
+      --card-en-text: #3b3214;
+      --card-zh-text: #3a3214;
+      --card-border-color: rgba(210, 175, 60, 0.4);
+    }
+
+    body.skin-green {
+      --bg-color: #eaf7f0;
+      --bg-color-soft: #d6f0e1;
+      --card-bg: #f7fffa;
+      --card-text-color: #163526;
+      --accent-color: #36a56a;
+      --accent-soft: #79c894;
+      --accent-strong: #248251;
+      --text-secondary: #4b6a57;
+      --card-shadow: 0 8px 20px rgba(43, 124, 82, 0.16);
+      --card-shadow-strong: 0 10px 26px rgba(43, 124, 82, 0.26);
+      --card-en-bg: linear-gradient(145deg, #e4f7ea, #c9eed8);
+      --card-zh-bg: linear-gradient(145deg, #f3fff7, #ddf5e6);
+      --card-en-text: #123524;
+      --card-zh-text: #163526;
+      --card-border-color: rgba(60, 140, 90, 0.38);
+    }
+
+    body.skin-cyan {
+      --bg-color: #e7f7fa;
+      --bg-color-soft: #d0edf5;
+      --card-bg: #f7feff;
+      --card-text-color: #11323b;
+      --accent-color: #36a3c8;
+      --accent-soft: #7cc7e1;
+      --accent-strong: #1f7ea0;
+      --text-secondary: #476373;
+      --card-shadow: 0 8px 20px rgba(46, 124, 148, 0.16);
+      --card-shadow-strong: 0 10px 26px rgba(46, 124, 148, 0.28);
+      --card-en-bg: linear-gradient(145deg, #e3f7ff, #c8ebf7);
+      --card-zh-bg: linear-gradient(145deg, #f5fdff, #ddf4fb);
+      --card-en-text: #10323c;
+      --card-zh-text: #11323b;
+      --card-border-color: rgba(70, 140, 165, 0.4);
+    }
+
+    body.skin-blue {
+      --bg-color: #f1f5ff;
+      --bg-color-soft: #dde7ff;
+      --card-bg: #ffffff;
+      --card-text-color: #1f2435;
+      --accent-color: #4a7ef2;
+      --accent-soft: #8fb0ff;
+      --accent-strong: #315ed4;
+      --text-secondary: #606782;
+      --card-shadow: 0 8px 20px rgba(45, 72, 160, 0.16);
+      --card-shadow-strong: 0 10px 26px rgba(45, 72, 160, 0.26);
+      --card-en-bg: linear-gradient(145deg, #ecf2ff, #d0ddff);
+      --card-zh-bg: linear-gradient(145deg, #f8f9ff, #e5ecff);
+      --card-en-text: #1f2435;
+      --card-zh-text: #262b3a;
+      --card-border-color: rgba(90, 120, 210, 0.38);
+    }
+
+    body.skin-purple {
+      --bg-color: #f6f1ff;
+      --bg-color-soft: #e5d6ff;
+      --card-bg: #fdfbff;
+      --card-text-color: #271a3b;
+      --accent-color: #8a5ae6;
+      --accent-soft: #b191f4;
+      --accent-strong: #6b3ac5;
+      --text-secondary: #75608f;
+      --card-shadow: 0 8px 20px rgba(104, 73, 170, 0.18);
+      --card-shadow-strong: 0 10px 26px rgba(104, 73, 170, 0.28);
+      --card-en-bg: linear-gradient(145deg, #f1e7ff, #e0d0ff);
+      --card-zh-bg: linear-gradient(145deg, #faf5ff, #ecddff);
+      --card-en-text: #291a3d;
+      --card-zh-text: #2b1d40;
+      --card-border-color: rgba(120, 90, 190, 0.4);
+    }
+
+    body.skin-gray {
+      --bg-color: #f4f5f7;
+      --bg-color-soft: #e1e4ea;
+      --card-bg: #ffffff;
+      --card-text-color: #22242b;
+      --accent-color: #7b8ba3;
+      --accent-soft: #a2afc3;
+      --accent-strong: #5b6577;
+      --text-secondary: #6d7280;
+      --card-shadow: 0 8px 20px rgba(60, 72, 88, 0.14);
+      --card-shadow-strong: 0 10px 26px rgba(60, 72, 88, 0.22);
+      --card-en-bg: linear-gradient(145deg, #f1f3f7, #dde1ea);
+      --card-zh-bg: linear-gradient(145deg, #fbfcfe, #e8ebf2);
+      --card-en-text: #22242b;
+      --card-zh-text: #262831;
+      --card-border-color: rgba(120, 130, 145, 0.32);
+    }
+
+    body.skin-black {
+      --bg-color: #060712;
+      --bg-color-soft: #111525;
+      --card-bg: #191e30;
+      --card-text-color: #f3f4ff;
+      --accent-color: #5b8dff;
+      --accent-soft: #4fd1c5;
+      --accent-strong: #7f9bff;
+      --text-secondary: #9da4c7;
+      --card-shadow: 0 10px 28px rgba(0, 0, 0, 0.7);
+      --card-shadow-strong: 0 14px 40px rgba(0, 0, 0, 0.85);
+      --card-en-bg: linear-gradient(145deg, #212840, #151a2b);
+      --card-zh-bg: linear-gradient(145deg, #191f32, #111523);
+      --card-en-text: #f5f6ff;
+      --card-zh-text: #ecefff;
+      --card-border-color: rgba(140, 160, 255, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.85), rgba(0,0,0,0)) , var(--bg-color);
+      color: var(--card-text-color);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 10px 12px;
+      min-height: 100vh;
+    }
+
+    @media (min-width: 768px) {
+      .app {
+        padding: 16px 20px 20px;
+      }
+    }
+
+    /* ===== 顶部控制区 ===== */
+    .top-bar {
+      border-radius: 18px;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
+      box-shadow: 0 14px 40px rgba(15, 35, 80, 0.06);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      backdrop-filter: blur(12px);
+    }
+
+    body.skin-black .top-bar {
+      background: linear-gradient(135deg, rgba(10,10,20,0.95), rgba(30,30,60,0.85));
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+    }
+    body.skin-black .top-bar * {
+      color: #e5e7f5;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-right: 12px;
+    }
+
+    .title-main {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .title-sub {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      flex: 1;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .control-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-color-soft);
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+
+    body.skin-night .control-group {
+      background: rgba(15, 20, 40, 0.9);
+    }
+
+    .control-label {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    select, button {
+      font-family: inherit;
+    }
+
+    .select {
+      border-radius: 999px;
+      border: none;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      background: #ffffff;
+      color: var(--card-text-color);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+      cursor: pointer;
+    }
+    body.skin-night .select {
+      background: #1b2033;
+      color: #e5e7f5;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-strong));
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(15, 35, 80, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 34px rgba(15, 35, 80, 0.4);
+    }
+
+    .btn-pill {
+      background: rgba(255,255,255,0.9);
+      color: var(--card-text-color);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+    }
+
+    body.skin-night .btn-pill {
+      background: #20263a;
+      color: #e5e7f5;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+    }
+
+    .btn-pill.active {
+      background: var(--accent-color);
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(15, 35, 80, 0.6);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 4px 10px;
+      box-shadow: none;
+    }
+
+    .btn-ghost.on {
+      color: var(--accent-color);
+      font-weight: 700;
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+    }
+
+    .skins {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 3px 4px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+      max-width: 260px;
+    }
+    body.skin-black .skins {
+      background: rgba(10,10,20,0.9);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .skin-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.06);
+      padding: 2px 7px 2px 3px;
+      background: rgba(255,255,255,0.9);
+      font-size: 0.72rem;
+      color: var(--card-text-color);
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    }
+
+    .skin-item-label {
+      white-space: nowrap;
+    }
+
+    .skin-item.active {
+      border-color: var(--accent-color);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.16);
+    }
+
+    .skin-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.8), 0 0 0 2px rgba(0,0,0,0.02);
+    }
+
+    .skin-swatch.red {
+      background: linear-gradient(135deg, #ffd6d6, #f06a6a);
+    }
+    .skin-swatch.orange {
+      background: linear-gradient(135deg, #ffe0c2, #f29b4b);
+    }
+    .skin-swatch.yellow {
+      background: linear-gradient(135deg, #fff2b8, #f2c94c);
+    }
+    .skin-swatch.green {
+      background: linear-gradient(135deg, #ccefdc, #36a56a);
+    }
+    .skin-swatch.cyan {
+      background: linear-gradient(135deg, #c6edf7, #36a3c8);
+    }
+    .skin-swatch.blue {
+      background: linear-gradient(135deg, #d8e4ff, #4a7ef2);
+    }
+    .skin-swatch.purple {
+      background: linear-gradient(135deg, #e4d6ff, #8a5ae6);
+    }
+    .skin-swatch.gray {
+      background: linear-gradient(135deg, #e2e4ea, #7b8ba3);
+    }
+    .skin-swatch.black {
+      background: radial-gradient(circle at 30% 20%, #4c5bff, #050612);
+    }
+
+    @media (max-width: 720px) {
+      .top-bar {
+        align-items: flex-start;
+      }
+      .control-row {
+        justify-content: flex-start;
+      }
+    }
+
+    /* ===== 主游戏区域 ===== */
+    .game-area {
+      flex: 1;
+      margin-top: 12px;
+      border-radius: 20px;
+      padding: 12px 10px 10px;
+      background: radial-gradient(circle at top right, rgba(255,255,255,0.86), rgba(255,255,255,0.7));
+      box-shadow: 0 16px 50px rgba(15, 35, 80, 0.09);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    body.skin-black .game-area {
+      background: radial-gradient(circle at top right, rgba(255,255,255,0.03), rgba(0,0,0,0.65));
+      box-shadow: 0 18px 60px rgba(0,0,0,0.75);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: 1fr;
+      gap: 12px;
+      width: min(900px, 92vw);
+      aspect-ratio: 4 / 6;
+      max-height: calc(100vh - 170px);
+      padding: 8px;
+    }
+
+    .hint {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      text-align: center;
+      padding-top: 18px;
+    }
+
+    .hint small {
+      display: block;
+      margin-top: 4px;
+      opacity: 0.9;
+    }
+
+    /* ===== 卡片样式 ===== */
+    .card {
+      cursor: pointer;
+      border-radius: var(--border-radius);
+      box-shadow: var(--card-shadow);
+      padding: 10px 8px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      border: 1px solid var(--card-border-color);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-med), opacity var(--transition-med), filter var(--transition-fast);
+      will-change: transform, box-shadow, opacity;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        min-height: 96px;
+        padding: 14px 10px;
+      }
+    }
+
+    .card-inner {
+      text-align: center;
+      padding: 4px 4px;
+    }
+
+    .card-text-en {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .card-text-zh {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .card-en {
+      background: var(--card-en-bg);
+      color: var(--card-en-text);
+    }
+
+    .card-zh {
+      background: var(--card-zh-bg);
+      color: var(--card-zh-text);
+    }
+
+    .card:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--card-shadow-strong);
+    }
+
+    .card.selected {
+      box-shadow: var(--card-shadow-strong);
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .card.speaking {
+      outline: 2px solid var(--accent-strong);
+      outline-offset: -2px;
+    }
+
+    .card.matched,
+    .card.card-hidden {
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .card.shake {
+      animation: shake 0.25s ease-out;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      50% { transform: translateX(3px); }
+      75% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* ===== 底部信息栏 ===== */
+    .bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      padding: 0 3px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stats {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--accent-color);
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.04);
+      color: var(--card-text-color);
+    }
+
+    body.skin-night .badge {
+      background: rgba(255,255,255,0.1);
+      color: #e5e7f5;
+    }
+
+    /* ===== 通关遮罩与烟花画布 ===== */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease-out;
+      z-index: 20;
+    }
+
+    .overlay.active {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .overlay-backdrop {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+      backdrop-filter: blur(6px);
+    }
+
+    .overlay-content {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.96);
+      border-radius: 22px;
+      padding: 20px 18px 16px;
+      text-align: center;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.4);
+      max-width: 320px;
+      width: 82vw;
+    }
+
+    body.skin-black .overlay-content {
+      background: rgba(12, 16, 30, 0.98);
+      color: #f9fafb;
+    }
+
+    .overlay-title {
+      font-size: 1.35rem;
+      margin-bottom: 4px;
+    }
+
+    .overlay-text {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .overlay-btn {
+      margin-top: 6px;
+      width: 100%;
+    }
+
+    .fireworks-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      .title-main {
+        font-size: 0.95rem;
+      }
+      .card-text-en {
+        font-size: 0.95rem;
+      }
+      .card-text-zh {
+        font-size: 0.84rem;
+      }
+      .game-area {
+        padding: 10px 8px 8px;
+      }
+    }
+  </style>
+</head>
+<body class="skin-blue">
+  <!-- 顶部控制区 -->
+  <div class="app">
+    <header class="top-bar">
+      <div class="title-block">
+        <div class="title-main">中英文单词消消乐</div>
+        <div class="title-sub">点击英文发音，匹配对应中文释义</div>
+      </div>
+      <div class="control-row">
+        <div class="control-group">
+          <span class="control-label">词库</span>
+          <select id="category-select" class="select">
+            <option value="junior">初中英语</option>
+            <option value="senior">高中英语</option>
+            <option value="it">IT 英语</option>
+            <option value="abroad">出国英语</option>
+            <option value="phrase">常用英语短语</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <span class="control-label">本局词对</span>
+          <select id="pair-count-select" class="select">
+            <option value="8">8 对（轻松）</option>
+            <option value="12">12 对（标准）</option>
+            <option value="16">16 对（挑战）</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <span class="control-label">皮肤</span>
+          <div class="skins" id="skin-group">
+            <button class="skin-item" data-skin="red">
+              <span class="skin-swatch red"></span>
+              <span class="skin-item-label">赤</span>
+            </button>
+            <button class="skin-item" data-skin="orange">
+              <span class="skin-swatch orange"></span>
+              <span class="skin-item-label">橙</span>
+            </button>
+            <button class="skin-item" data-skin="yellow">
+              <span class="skin-swatch yellow"></span>
+              <span class="skin-item-label">黄</span>
+            </button>
+            <button class="skin-item" data-skin="green">
+              <span class="skin-swatch green"></span>
+              <span class="skin-item-label">绿</span>
+            </button>
+            <button class="skin-item" data-skin="cyan">
+              <span class="skin-swatch cyan"></span>
+              <span class="skin-item-label">青</span>
+            </button>
+            <button class="skin-item" data-skin="blue">
+              <span class="skin-swatch blue"></span>
+              <span class="skin-item-label">蓝</span>
+            </button>
+            <button class="skin-item" data-skin="purple">
+              <span class="skin-swatch purple"></span>
+              <span class="skin-item-label">紫</span>
+            </button>
+            <button class="skin-item" data-skin="gray">
+              <span class="skin-swatch gray"></span>
+              <span class="skin-item-label">灰</span>
+            </button>
+            <button class="skin-item" data-skin="black">
+              <span class="skin-swatch black"></span>
+              <span class="skin-item-label">黑</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <button id="toggle-bgm" class="btn btn-ghost">🎵 BGM: 开</button>
+          <button id="toggle-sfx" class="btn btn-ghost">🔔 音效: 开</button>
+        </div>
+
+        <button id="start-btn" class="btn btn-primary">
+          ▶ 开始 / 换一局
+        </button>
+      </div>
+    </header>
+
+    <!-- 游戏主区域 -->
+    <main class="game-area">
+      <div id="card-container" class="card-grid"></div>
+      <div id="empty-hint" class="hint">
+        点击右侧「开始 / 换一局」生成卡片<br/>
+        <small>提示：点击英文卡片会自动发音，再点对应的中文释义完成匹配</small>
+      </div>
+    </main>
+
+    <!-- 底部信息栏 -->
+    <footer class="bottom-bar">
+      <div class="stats">
+        <span class="badge"><span class="dot"></span> 本局进度：<span id="progress-text">0 / 0</span></span>
+        <span class="badge">错误次数：<span id="miss-text">0</span></span>
+      </div>
+      <div class="hint-mini">
+        <span class="badge">💡 示例词库可按同样格式自行扩展到 2000+ 条</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 通关遮罩与烟花 -->
+  <canvas id="fireworks-canvas" class="fireworks-canvas"></canvas>
+
+  <div id="victory-overlay" class="overlay hidden">
+    <div class="overlay-backdrop"></div>
+    <div class="overlay-content">
+      <div class="overlay-title">恭喜完成 🎉</div>
+      <div class="overlay-text">所有单词都已成功匹配，继续下一局巩固记忆吧！</div>
+      <button id="overlay-restart" class="btn btn-primary overlay-btn">再来一局</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== 词库定义（示例：可按同样结构扩展到 2000+ 条） =====
+    const WORD_BANKS = {
+      // 初中英语高频词汇
+      junior: [
+        { en: "apple", zh: "苹果" },
+        { en: "banana", zh: "香蕉" },
+        { en: "orange", zh: "橙子" },
+        { en: "teacher", zh: "老师" },
+        { en: "student", zh: "学生" },
+        { en: "family", zh: "家庭" },
+        { en: "friend", zh: "朋友" },
+        { en: "classroom", zh: "教室" },
+        { en: "notebook", zh: "笔记本" },
+        { en: "homework", zh: "家庭作业" },
+        { en: "library", zh: "图书馆" },
+        { en: "weather", zh: "天气" },
+        { en: "rainy", zh: "下雨的" },
+        { en: "sunny", zh: "晴朗的" },
+        { en: "cloudy", zh: "多云的" },
+        { en: "winter", zh: "冬天" },
+        { en: "summer", zh: "夏天" },
+        { en: "spring", zh: "春天" },
+        { en: "autumn", zh: "秋天" },
+        { en: "breakfast", zh: "早餐" },
+        { en: "lunch", zh: "午餐" },
+        { en: "dinner", zh: "晚餐" },
+        { en: "music", zh: "音乐" },
+        { en: "sport", zh: "运动" },
+        { en: "basketball", zh: "篮球" },
+        { en: "football", zh: "足球" },
+        { en: "swim", zh: "游泳" },
+        { en: "read", zh: "阅读" },
+        { en: "write", zh: "写作" },
+        { en: "listen", zh: "听" },
+        { en: "speak", zh: "说" },
+        { en: "today", zh: "今天" },
+        { en: "yesterday", zh: "昨天" },
+        { en: "tomorrow", zh: "明天" },
+        { en: "usually", zh: "通常" },
+        { en: "often", zh: "经常" },
+        { en: "sometimes", zh: "有时" },
+        { en: "never", zh: "从不" },
+        { en: "always", zh: "总是" },
+        { en: "excited", zh: "兴奋的" },
+        { en: "happy", zh: "高兴的" },
+        { en: "tired", zh: "疲倦的" },
+        { en: "hungry", zh: "饥饿的" },
+        { en: "thirsty", zh: "口渴的" },
+        { en: "subject", zh: "学科" },
+        { en: "English", zh: "英语" },
+        { en: "math", zh: "数学" },
+        { en: "science", zh: "科学" },
+        { en: "history", zh: "历史" },
+        { en: "geography", zh: "地理" },
+        { en: "art", zh: "美术" }
+      ],
+      // 高中英语词汇
+      senior: [
+        { en: "analyze", zh: "分析" },
+        { en: "approach", zh: "方法；接近" },
+        { en: "argument", zh: "论点；争论" },
+        { en: "concept", zh: "概念" },
+        { en: "contrast", zh: "对比" },
+        { en: "criticism", zh: "批评；评论" },
+        { en: "evidence", zh: "证据" },
+        { en: "hypothesis", zh: "假设" },
+        { en: "significant", zh: "重要的；显著的" },
+        { en: "efficient", zh: "高效的" },
+        { en: "complex", zh: "复杂的" },
+        { en: "consequence", zh: "结果；后果" },
+        { en: "consumption", zh: "消费；消耗" },
+        { en: "cooperate", zh: "合作" },
+        { en: "determine", zh: "决定；确定" },
+        { en: "environment", zh: "环境" },
+        { en: "evolution", zh: "进化；演变" },
+        { en: "globalization", zh: "全球化" },
+        { en: "impact", zh: "影响；冲击" },
+        { en: "maintain", zh: "维持；主张" },
+        { en: "migrate", zh: "迁移" },
+        { en: "motivation", zh: "动机" },
+        { en: "opportunity", zh: "机会" },
+        { en: "perspective", zh: "观点；视角" },
+        { en: "potential", zh: "潜力；潜在的" },
+        { en: "procedure", zh: "程序；手续" },
+        { en: "reaction", zh: "反应" },
+        { en: "reliable", zh: "可靠的" },
+        { en: "significance", zh: "意义；重要性" },
+        { en: "strategy", zh: "策略" },
+        { en: "structure", zh: "结构" },
+        { en: "sufficient", zh: "足够的" },
+        { en: "sustainable", zh: "可持续的" },
+        { en: "technology", zh: "技术" },
+        { en: "trend", zh: "趋势" },
+        { en: "urbanization", zh: "城市化" },
+        { en: "virtual", zh: "虚拟的；几乎的" },
+        { en: "participate", zh: "参与" },
+        { en: "persuade", zh: "说服" },
+        { en: "guarantee", zh: "保证；担保" },
+        { en: "contrast", zh: "对比；对照" },
+        { en: "illustrate", zh: "说明；举例说明" },
+        { en: "unique", zh: "独特的" },
+        { en: "flexible", zh: "灵活的" },
+        { en: "curiosity", zh: "好奇心" },
+        { en: "concentration", zh: "集中；专注" },
+        { en: "efficiently", zh: "高效地" },
+        { en: "represent", zh: "代表；象征" },
+        { en: "scholarship", zh: "奖学金" },
+        { en: "volunteer", zh: "志愿者；志愿" }
+      ],
+      // IT 英语常用词汇
+      it: [
+        { en: "algorithm", zh: "算法" },
+        { en: "array", zh: "数组" },
+        { en: "binary", zh: "二进制" },
+        { en: "bug", zh: "程序错误" },
+        { en: "compile", zh: "编译" },
+        { en: "debug", zh: "调试" },
+        { en: "database", zh: "数据库" },
+        { en: "deployment", zh: "部署" },
+        { en: "encryption", zh: "加密" },
+        { en: "framework", zh: "框架" },
+        { en: "frontend", zh: "前端" },
+        { en: "backend", zh: "后端" },
+        { en: "fullstack", zh: "全栈" },
+        { en: "function", zh: "函数" },
+        { en: "variable", zh: "变量" },
+        { en: "constant", zh: "常量" },
+        { en: "interface", zh: "接口" },
+        { en: "module", zh: "模块" },
+        { en: "network", zh: "网络" },
+        { en: "protocol", zh: "协议" },
+        { en: "request", zh: "请求" },
+        { en: "response", zh: "响应" },
+        { en: "server", zh: "服务器" },
+        { en: "client", zh: "客户端" },
+        { en: "version", zh: "版本" },
+        { en: "virtual machine", zh: "虚拟机" },
+        { en: "cloud", zh: "云；云计算" },
+        { en: "container", zh: "容器" },
+        { en: "microservice", zh: "微服务" },
+        { en: "load balancer", zh: "负载均衡" },
+        { en: "latency", zh: "延迟" },
+        { en: "bandwidth", zh: "带宽" },
+        { en: "open source", zh: "开源" },
+        { en: "repository", zh: "代码仓库" },
+        { en: "branch", zh: "分支" },
+        { en: "merge", zh: "合并" },
+        { en: "commit", zh: "提交" },
+        { en: "rollback", zh: "回滚" },
+        { en: "cache", zh: "缓存" },
+        { en: "session", zh: "会话" },
+        { en: "cookie", zh: "Cookie（小型数据）" },
+        { en: "authentication", zh: "认证" },
+        { en: "authorization", zh: "授权" },
+        { en: "encryption key", zh: "加密密钥" },
+        { en: "hash", zh: "哈希" },
+        { en: "scalability", zh: "可扩展性" },
+        { en: "high availability", zh: "高可用" },
+        { en: "concurrency", zh: "并发" },
+        { en: "thread", zh: "线程" },
+        { en: "performance", zh: "性能" }
+      ],
+      // 出国英语词汇
+      abroad: [
+        { en: "boarding pass", zh: "登机牌" },
+        { en: "passport", zh: "护照" },
+        { en: "visa", zh: "签证" },
+        { en: "customs", zh: "海关" },
+        { en: "security check", zh: "安检" },
+        { en: "departure", zh: "出发" },
+        { en: "arrival", zh: "到达" },
+        { en: "flight", zh: "航班" },
+        { en: "gate", zh: "登机口" },
+        { en: "baggage claim", zh: "行李提取处" },
+        { en: "carry-on luggage", zh: "随身行李" },
+        { en: "accommodation", zh: "住宿" },
+        { en: "reservation", zh: "预订" },
+        { en: "check in", zh: "办理入住" },
+        { en: "check out", zh: "退房" },
+        { en: "currency exchange", zh: "货币兑换" },
+        { en: "credit card", zh: "信用卡" },
+        { en: "tip", zh: "小费" },
+        { en: "tourist attraction", zh: "旅游景点" },
+        { en: "museum", zh: "博物馆" },
+        { en: "gallery", zh: "美术馆" },
+        { en: "subway", zh: "地铁" },
+        { en: "bus stop", zh: "公交车站" },
+        { en: "ticket office", zh: "售票处" },
+        { en: "lost and found", zh: "失物招领处" },
+        { en: "pharmacy", zh: "药店" },
+        { en: "emergency", zh: "紧急情况" },
+        { en: "insurance", zh: "保险" },
+        { en: "appointment", zh: "预约" },
+        { en: "doctor", zh: "医生" },
+        { en: "allergy", zh: "过敏" },
+        { en: "vegetarian", zh: "素食者" },
+        { en: "receipt", zh: "收据" },
+        { en: "discount", zh: "折扣" },
+        { en: "souvenir", zh: "纪念品" },
+        { en: "tour guide", zh: "导游" },
+        { en: "host family", zh: "寄宿家庭" },
+        { en: "orientation", zh: "迎新会；适应期" },
+        { en: "campus", zh: "校园" },
+        { en: "dormitory", zh: "宿舍" },
+        { en: "semester", zh: "学期" },
+        { en: "tuition fee", zh: "学费" },
+        { en: "scholarship", zh: "奖学金" },
+        { en: "certificate", zh: "证书" },
+        { en: "application form", zh: "申请表" },
+        { en: "deadline", zh: "截止日期" },
+        { en: "interview", zh: "面试" },
+        { en: "orientation week", zh: "迎新周" },
+        { en: "emergency contact", zh: "紧急联系人" },
+        { en: "public transportation", zh: "公共交通" }
+      ],
+      // 常用英语短语
+      phrase: [
+        { en: "take off", zh: "起飞；脱下（衣物）" },
+        { en: "pick up", zh: "接人；捡起；学会" },
+        { en: "wake up", zh: "醒来；叫醒" },
+        { en: "look for", zh: "寻找" },
+        { en: "look after", zh: "照顾" },
+        { en: "turn on", zh: "打开（电器）" },
+        { en: "turn off", zh: "关闭（电器）" },
+        { en: "put on", zh: "穿上；佩戴" },
+        { en: "take care of", zh: "照顾；处理" },
+        { en: "pay attention to", zh: "注意；关注" },
+        { en: "in charge of", zh: "负责，主管" },
+        { en: "as soon as", zh: "一…就…" },
+        { en: "as well as", zh: "以及；和…一样" },
+        { en: "in front of", zh: "在…前面" },
+        { en: "on time", zh: "准时" },
+        { en: "at least", zh: "至少" },
+        { en: "by the way", zh: "顺便说一下" },
+        { en: "more or less", zh: "或多或少；大致" },
+        { en: "so far", zh: "到目前为止" },
+        { en: "no matter", zh: "无论，不管" },
+        { en: "kind of", zh: "有点儿；某种" },
+        { en: "a couple of", zh: "几个；一对" },
+        { en: "make sure", zh: "确保" },
+        { en: "figure out", zh: "弄清楚；理解" },
+        { en: "get along with", zh: "与…相处融洽" },
+        { en: "run out of", zh: "用完；耗尽" },
+        { en: "break down", zh: "出故障；崩溃" },
+        { en: "look forward to", zh: "期待；盼望" },
+        { en: "come true", zh: "实现；成真" },
+        { en: "take part in", zh: "参加" },
+        { en: "according to", zh: "根据；按照" },
+        { en: "in order to", zh: "为了" },
+        { en: "as a result", zh: "结果；因此" },
+        { en: "in general", zh: "一般来说" },
+        { en: "at the same time", zh: "同时" },
+        { en: "for example", zh: "例如" },
+        { en: "in other words", zh: "换句话说" },
+        { en: "more importantly", zh: "更重要的是" },
+        { en: "on the other hand", zh: "另一方面" },
+        { en: "in my opinion", zh: "在我看来" },
+        { en: "to be honest", zh: "说实话" },
+        { en: "as far as I know", zh: "据我所知" },
+        { en: "to some extent", zh: "在某种程度上" },
+        { en: "come up with", zh: "提出；想出" },
+        { en: "keep in mind", zh: "记住；牢记" },
+        { en: "look into", zh: "调查；研究" },
+        { en: "instead of", zh: "而不是" },
+        { en: "in case", zh: "以防；万一" },
+        { en: "once in a while", zh: "偶尔；不时" },
+        { en: "make a difference", zh: "产生影响；有所作为" }
+      ]
+    };
+
+    // ===== 全局状态与设置 =====
+    const STORAGE_KEYS = {
+      skin: "wm_skin",
+      bgm: "wm_bgm",
+      sfx: "wm_sfx",
+      category: "wm_category",
+      pairCount: "wm_pair_count"
+    };
+
+    const AVAILABLE_SKINS = ["red","orange","yellow","green","cyan","blue","purple","gray","black"];
+
+    const settings = {
+      skin: "blue",
+      bgmEnabled: true,
+      sfxEnabled: true,
+      category: "junior",
+      pairCount: 12
+    };
+
+    const state = {
+      cards: [],
+      firstCardEl: null,
+      lock: false,
+      matchedPairs: 0,
+      totalPairs: 0,
+      misses: 0,
+      gameActive: false,
+      fireworksRunning: false,
+      fireworksHandle: null,
+      fireworksParticles: []
+    };
+
+    const dom = {};
+    let audioCtx = null;
+    let masterGain = null;
+    let bgmGain = null;
+    let sfxGain = null;
+    let bgmSource = null;
+    let speechVoice = null;
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    function init() {
+      cacheDom();
+      loadSettings();
+      applySkin(settings.skin);
+      bindEvents();
+      updateAudioButtons();
+      updateSelects();
+      updateStats();
+
+      initSpeech();
+      initFireworksCanvas();
+      window.addEventListener("resize", initFireworksCanvas);
+
+      settings.category = "junior";
+      settings.pairCount = 12;
+      updateSelects();
+      startNewGame();
+    }
+
+    // ===== DOM 缓存与绑定 =====
+    function cacheDom() {
+      dom.cardContainer = document.getElementById("card-container");
+      dom.emptyHint = document.getElementById("empty-hint");
+      dom.categorySelect = document.getElementById("category-select");
+      dom.pairCountSelect = document.getElementById("pair-count-select");
+      dom.startBtn = document.getElementById("start-btn");
+      dom.toggleBgmBtn = document.getElementById("toggle-bgm");
+      dom.toggleSfxBtn = document.getElementById("toggle-sfx");
+      dom.skinGroup = document.getElementById("skin-group");
+      dom.progressText = document.getElementById("progress-text");
+      dom.missText = document.getElementById("miss-text");
+      dom.victoryOverlay = document.getElementById("victory-overlay");
+      dom.overlayRestart = document.getElementById("overlay-restart");
+      dom.fireworksCanvas = document.getElementById("fireworks-canvas");
+      dom.fireCtx = dom.fireworksCanvas.getContext("2d");
+    }
+
+    function bindEvents() {
+      dom.startBtn.addEventListener("click", () => {
+        ensureAudioContext();
+        startNewGame();
+      });
+
+      dom.categorySelect.addEventListener("change", (e) => {
+        settings.category = e.target.value;
+        saveSettings();
+      });
+
+      dom.pairCountSelect.addEventListener("change", (e) => {
+        const v = parseInt(e.target.value, 10);
+        settings.pairCount = isNaN(v) ? 12 : v;
+        saveSettings();
+      });
+
+      dom.toggleBgmBtn.addEventListener("click", () => {
+        settings.bgmEnabled = !settings.bgmEnabled;
+        if (bgmGain) {
+          bgmGain.gain.setTargetAtTime(settings.bgmEnabled ? 0.4 : 0, audioCtx.currentTime, 0.05);
+        }
+        if (settings.bgmEnabled) {
+          ensureAudioContext();
+          startBgm();
+        } else {
+          stopBgm();
+        }
+        updateAudioButtons();
+        saveSettings();
+      });
+
+      dom.toggleSfxBtn.addEventListener("click", () => {
+        settings.sfxEnabled = !settings.sfxEnabled;
+        if (sfxGain) {
+          sfxGain.gain.setTargetAtTime(settings.sfxEnabled ? 0.9 : 0, audioCtx ? audioCtx.currentTime : 0, 0.02);
+        }
+        updateAudioButtons();
+        saveSettings();
+      });
+
+      dom.skinGroup.addEventListener("click", (e) => {
+        const btn = e.target.closest(".skin-item");
+        if (!btn) return;
+        const skin = btn.getAttribute("data-skin");
+        if (!skin) return;
+        settings.skin = skin;
+        applySkin(skin);
+        saveSettings();
+      });
+
+      dom.overlayRestart.addEventListener("click", () => {
+        hideVictoryOverlay();
+        startNewGame();
+      });
+
+      dom.victoryOverlay.addEventListener("click", (e) => {
+        if (e.target === dom.victoryOverlay || e.target.classList.contains("overlay-backdrop")) {
+          hideVictoryOverlay();
+        }
+      });
+    }
+
+    // ===== 设置存取 =====
+    function loadSettings() {
+      try {
+        let skin = localStorage.getItem(STORAGE_KEYS.skin);
+        const bgm = localStorage.getItem(STORAGE_KEYS.bgm);
+        const sfx = localStorage.getItem(STORAGE_KEYS.sfx);
+        const category = localStorage.getItem(STORAGE_KEYS.category);
+        const pairCount = localStorage.getItem(STORAGE_KEYS.pairCount);
+
+        if (skin) {
+          const legacyMap = { fresh: "blue", forest: "green", night: "black", sand: "orange" };
+          const mapped = legacyMap[skin] || skin;
+          if (AVAILABLE_SKINS.indexOf(mapped) !== -1) {
+            settings.skin = mapped;
+          }
+        }
+        if (bgm === "off") settings.bgmEnabled = false;
+        if (sfx === "off") settings.sfxEnabled = false;
+        if (category && WORD_BANKS[category]) settings.category = category;
+        if (pairCount) {
+          const v = parseInt(pairCount, 10);
+          if (!isNaN(v)) settings.pairCount = v;
+        }
+      } catch (err) {
+        console.warn("读取设置失败：", err);
+      }
+    }
+
+    function saveSettings() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.skin, settings.skin);
+        localStorage.setItem(STORAGE_KEYS.bgm, settings.bgmEnabled ? "on" : "off");
+        localStorage.setItem(STORAGE_KEYS.sfx, settings.sfxEnabled ? "on" : "off");
+        localStorage.setItem(STORAGE_KEYS.category, settings.category);
+        localStorage.setItem(STORAGE_KEYS.pairCount, String(settings.pairCount));
+      } catch (err) {
+        console.warn("保存设置失败：", err);
+      }
+    }
+
+    function applySkin(skin) {
+      document.body.classList.remove(
+        "skin-red",
+        "skin-orange",
+        "skin-yellow",
+        "skin-green",
+        "skin-cyan",
+        "skin-blue",
+        "skin-purple",
+        "skin-gray",
+        "skin-black"
+      );
+      document.body.classList.add("skin-" + skin);
+      if (dom.skinGroup) {
+        Array.from(dom.skinGroup.querySelectorAll(".skin-item")).forEach((el) => {
+          el.classList.toggle("active", el.getAttribute("data-skin") === skin);
+        });
+      }
+    }
+
+    function updateAudioButtons() {
+      dom.toggleBgmBtn.textContent = (settings.bgmEnabled ? "🎵 BGM: 开" : "🎵 BGM: 关");
+      dom.toggleSfxBtn.textContent = (settings.sfxEnabled ? "🔔 音效: 开" : "🔔 音效: 关");
+    }
+
+    function updateSelects() {
+      dom.categorySelect.value = settings.category;
+      dom.pairCountSelect.value = String(settings.pairCount);
+    }
+
+    // ===== 游戏逻辑：创建与匹配 =====
+    function startNewGame() {
+      const bank = WORD_BANKS[settings.category] || [];
+      if (!bank.length) return;
+
+      state.gameActive = true;
+      state.matchedPairs = 0;
+      state.misses = 0;
+      state.firstCardEl = null;
+      state.lock = false;
+
+      // 随机抽取需要的词对
+      const maxPairs = Math.min(settings.pairCount, bank.length);
+      const pool = bank.slice();
+      shuffle(pool);
+      const selected = pool.slice(0, maxPairs);
+      state.totalPairs = selected.length;
+
+      renderCards(selected);
+      updateStats();
+      dom.emptyHint.classList.add("hidden");
+
+      if (settings.bgmEnabled) {
+        ensureAudioContext();
+        startBgm();
+      }
+    }
+
+    function renderCards(pairs) {
+      dom.cardContainer.innerHTML = "";
+      state.cards = [];
+
+      const temp = [];
+      pairs.forEach((item, index) => {
+        const id = settings.category + "_" + index + "_" + item.en;
+        temp.push({
+          id,
+          type: "en",
+          en: item.en,
+          zh: item.zh
+        });
+        temp.push({
+          id,
+          type: "zh",
+          en: item.en,
+          zh: item.zh
+        });
+      });
+
+      shuffle(temp);
+
+      temp.forEach((cardData) => {
+        const cardEl = document.createElement("div");
+        cardEl.className = "card card-" + cardData.type;
+        cardEl.dataset.id = cardData.id;
+        cardEl.dataset.type = cardData.type;
+        cardEl.dataset.en = cardData.en;
+        cardEl.dataset.zh = cardData.zh;
+
+        const inner = document.createElement("div");
+        inner.className = "card-inner";
+
+        if (cardData.type === "en") {
+          const main = document.createElement("div");
+          main.className = "card-text-en";
+          main.textContent = cardData.en;
+          inner.appendChild(main);
+        } else {
+          const main = document.createElement("div");
+          main.className = "card-text-zh";
+          main.textContent = cardData.zh;
+          inner.appendChild(main);
+        }
+
+        cardEl.appendChild(inner);
+        cardEl.addEventListener("click", () => handleCardClick(cardEl));
+        dom.cardContainer.appendChild(cardEl);
+        state.cards.push(cardEl);
+      });
+    }
+
+    function handleCardClick(cardEl) {
+      if (!state.gameActive) return;
+      if (state.lock) return;
+      if (cardEl.classList.contains("matched") || cardEl.classList.contains("card-hidden")) return;
+      if (state.firstCardEl === cardEl) return;
+
+      ensureAudioContext();
+      playClick();
+
+      const cardType = cardEl.dataset.type;
+      const enWord = cardEl.dataset.en;
+
+      if (cardType === "en") {
+        speakWord(enWord, cardEl);
+      }
+
+      selectCard(cardEl);
+
+      if (!state.firstCardEl) {
+        state.firstCardEl = cardEl;
+        return;
+      }
+
+      // 第二次点击进行匹配判断
+      const first = state.firstCardEl;
+      const second = cardEl;
+      state.firstCardEl = null;
+      state.lock = true;
+
+      const isMatch =
+        first.dataset.id === second.dataset.id &&
+        first.dataset.type !== second.dataset.type;
+
+      if (isMatch) {
+        playMatch();
+        animateMatch([first, second], () => {
+          first.classList.add("matched", "card-hidden");
+          second.classList.add("matched", "card-hidden");
+          state.matchedPairs++;
+          updateStats();
+          state.lock = false;
+
+          if (state.matchedPairs >= state.totalPairs) {
+            onGameComplete();
+          }
+        });
+      } else {
+        state.misses++;
+        updateStats();
+        playError();
+        shakeCards([first, second]);
+        setTimeout(() => {
+          deselectCard(first);
+          deselectCard(second);
+          state.lock = false;
+        }, 320);
+      }
+    }
+
+    function selectCard(el) {
+      el.classList.add("selected");
+    }
+
+    function deselectCard(el) {
+      el.classList.remove("selected");
+      el.classList.remove("speaking");
+    }
+
+    function updateStats() {
+      dom.progressText.textContent = state.totalPairs
+        ? state.matchedPairs + " / " + state.totalPairs
+        : "0 / 0";
+      dom.missText.textContent = String(state.misses);
+    }
+
+    // ===== Web Speech API 发音 =====
+    function initSpeech() {
+      if (!("speechSynthesis" in window)) {
+        console.warn("当前浏览器不支持 Web Speech API");
+        return;
+      }
+
+      function pickVoice() {
+        const voices = window.speechSynthesis.getVoices();
+        if (!voices || !voices.length) return;
+
+        const prefer = voices.filter((v) =>
+          /^en(-US|-GB)?/i.test(v.lang || "")
+        );
+        const english = voices.filter((v) =>
+          /^en/i.test(v.lang || "")
+        );
+        speechVoice = prefer[0] || english[0] || null;
+      }
+
+      pickVoice();
+      if (!speechVoice) {
+        window.speechSynthesis.addEventListener("voiceschanged", pickVoice, {
+          once: true
+        });
+      }
+    }
+
+    function speakWord(text, cardEl) {
+      if (!("speechSynthesis" in window)) return;
+      if (!text) return;
+
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        if (speechVoice) utter.voice = speechVoice;
+        utter.lang = "en-US";
+        utter.rate = 0.92;
+        utter.pitch = 1.02;
+        utter.volume = 1.0;
+
+        if (cardEl) {
+          cardEl.classList.add("speaking");
+          utter.onend = utter.onerror = () => {
+            cardEl.classList.remove("speaking");
+          };
+        }
+
+        window.speechSynthesis.speak(utter);
+      } catch (err) {
+        console.warn("发音失败：", err);
+      }
+    }
+
+    // ===== Web Audio：背景音乐与音效 =====
+    function ensureAudioContext() {
+      if (audioCtx) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) {
+        console.warn("当前浏览器不支持 Web Audio API");
+        return;
+      }
+      audioCtx = new AudioCtx();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.9;
+      masterGain.connect(audioCtx.destination);
+
+      bgmGain = audioCtx.createGain();
+      bgmGain.gain.value = settings.bgmEnabled ? 0.4 : 0;
+      bgmGain.connect(masterGain);
+
+      sfxGain = audioCtx.createGain();
+      sfxGain.gain.value = settings.sfxEnabled ? 0.9 : 0;
+      sfxGain.connect(masterGain);
+    }
+
+    function playTone(freq, duration, type, gainNode) {
+      if (!audioCtx || !gainNode) return;
+      if (!settings.sfxEnabled) return;
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.value = freq;
+
+      const now = audioCtx.currentTime;
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      osc.connect(gain).connect(gainNode);
+      osc.start(now);
+      osc.stop(now + duration + 0.05);
+    }
+
+    function playClick() {
+      playTone(750, 0.09, "triangle", sfxGain);
+    }
+
+    function playMatch() {
+      if (!audioCtx || !sfxGain || !settings.sfxEnabled) return;
+      playTone(540, 0.12, "sine", sfxGain);
+      setTimeout(() => playTone(780, 0.12, "sine", sfxGain), 70);
+    }
+
+    function playError() {
+      if (!audioCtx || !sfxGain || !settings.sfxEnabled) return;
+      playTone(260, 0.18, "sawtooth", sfxGain);
+    }
+
+    function playVictory() {
+      if (!audioCtx || !sfxGain || !settings.sfxEnabled) return;
+      playTone(660, 0.18, "sine", sfxGain);
+      setTimeout(() => playTone(880, 0.18, "sine", sfxGain), 120);
+      setTimeout(() => playTone(1040, 0.22, "triangle", sfxGain), 260);
+      playApplause();
+    }
+
+    // 简单鼓掌/喝彩效果：滤波白噪声
+    function playApplause() {
+      if (!audioCtx || !sfxGain || !settings.sfxEnabled) return;
+
+      const duration = 1.6;
+      const sampleRate = audioCtx.sampleRate;
+      const buffer = audioCtx.createBuffer(1, sampleRate * duration, sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        const t = i / sampleRate;
+        const env = Math.exp(-2.8 * t);
+        data[i] = (Math.random() * 2 - 1) * env;
+      }
+
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = 1800;
+      filter.Q.value = 1.4;
+
+      const gain = audioCtx.createGain();
+      gain.gain.value = 1.2;
+
+      src.connect(filter).connect(gain).connect(sfxGain);
+      src.start();
+    }
+
+    // 背景音乐：柔和循环音色
+    function startBgm() {
+      if (!audioCtx || !bgmGain) return;
+      if (!settings.bgmEnabled) return;
+
+      // 若已存在，则保持即可
+      if (bgmSource) return;
+
+      const duration = 6; // 秒
+      const sampleRate = audioCtx.sampleRate;
+      const buffer = audioCtx.createBuffer(1, sampleRate * duration, sampleRate);
+      const data = buffer.getChannelData(0);
+
+      // 生成柔和和弦垫底音色
+      for (let i = 0; i < data.length; i++) {
+        const t = i / sampleRate;
+        const base = Math.sin(2 * Math.PI * 220 * t);
+        const third = Math.sin(2 * Math.PI * 275 * t);
+        const fifth = Math.sin(2 * Math.PI * 330 * t);
+        const slow = Math.sin(2 * Math.PI * 0.1 * t) * 0.2 + 0.8; // 慢速起伏
+
+        data[i] = ((base * 0.6 + third * 0.35 + fifth * 0.25) / 1.2) * slow * 0.35;
+      }
+
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      src.loop = true;
+      src.connect(bgmGain);
+      src.start();
+      bgmSource = src;
+    }
+
+    function stopBgm() {
+      if (!bgmSource) return;
+      try {
+        bgmSource.stop();
+      } catch (e) {}
+      bgmSource.disconnect();
+      bgmSource = null;
+    }
+
+    // ===== 卡片动画与抖动（requestAnimationFrame） =====
+    function animateMatch(cards, done) {
+      const start = performance.now();
+      const duration = 260;
+
+      cards.forEach((c) => {
+        c.style.willChange = "transform, opacity";
+      });
+
+      function frame(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const pulse = 1 + 0.08 * Math.sin(t * Math.PI);
+        const opacity = 1 - t;
+
+        cards.forEach((c) => {
+          c.style.transform = "scale(" + pulse + ")";
+          c.style.opacity = String(opacity);
+        });
+
+        if (t < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          cards.forEach((c) => {
+            c.style.transform = "";
+            c.style.opacity = "";
+            c.classList.add("card-hidden");
+            c.style.willChange = "";
+          });
+          if (typeof done === "function") done();
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    function shakeCards(cards) {
+      cards.forEach((c) => {
+        c.classList.remove("shake");
+        void c.offsetWidth;
+        c.classList.add("shake");
+        c.addEventListener(
+          "animationend",
+          () => {
+            c.classList.remove("shake");
+          },
+          { once: true }
+        );
+      });
+    }
+
+    // ===== 通关逻辑与烟花效果 =====
+    function onGameComplete() {
+      state.gameActive = false;
+      playVictory();
+      showVictoryOverlay();
+      startFireworks();
+    }
+
+    function showVictoryOverlay() {
+      dom.victoryOverlay.classList.remove("hidden");
+      requestAnimationFrame(() => {
+        dom.victoryOverlay.classList.add("active");
+      });
+    }
+
+    function hideVictoryOverlay() {
+      dom.victoryOverlay.classList.remove("active");
+      setTimeout(() => {
+        dom.victoryOverlay.classList.add("hidden");
+      }, 260);
+      stopFireworks();
+    }
+
+    function initFireworksCanvas() {
+      const canvas = dom.fireworksCanvas;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      dom.fireCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function startFireworks() {
+      state.fireworksParticles = [];
+      state.fireworksRunning = true;
+      const ctx = dom.fireCtx;
+      let lastTime = performance.now();
+
+      function spawnFirework() {
+        const count = 40 + Math.floor(Math.random() * 20);
+        const x = Math.random() * window.innerWidth * 0.8 + window.innerWidth * 0.1;
+        const y = Math.random() * window.innerHeight * 0.5 + window.innerHeight * 0.15;
+        const hue = Math.random() * 60 + 200;
+
+        for (let i = 0; i < count; i++) {
+          const angle = (Math.PI * 2 * i) / count;
+          const speed = 80 + Math.random() * 80;
+          state.fireworksParticles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 1,
+            hue: hue + (Math.random() - 0.5) * 30
+          });
+        }
+      }
+
+      function loop(now) {
+        if (!state.fireworksRunning) return;
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        if (Math.random() < 0.12) {
+          spawnFirework();
+        }
+
+        const gravity = 200;
+        const drag = 0.98;
+
+        for (let i = state.fireworksParticles.length - 1; i >= 0; i--) {
+          const p = state.fireworksParticles[i];
+          p.vx *= drag;
+          p.vy = p.vy * drag + gravity * dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.life -= dt * 0.9;
+          if (p.life <= 0) {
+            state.fireworksParticles.splice(i, 1);
+            continue;
+          }
+          const alpha = Math.max(0, p.life);
+          ctx.beginPath();
+          ctx.fillStyle = "hsla(" + p.hue + ", 80%, 60%, " + alpha + ")";
+          ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        state.fireworksHandle = requestAnimationFrame(loop);
+      }
+
+      if (!state.fireworksHandle) {
+        state.fireworksHandle = requestAnimationFrame(loop);
+      }
+    }
+
+    function stopFireworks() {
+      state.fireworksRunning = false;
+      if (state.fireworksHandle) {
+        cancelAnimationFrame(state.fireworksHandle);
+        state.fireworksHandle = null;
+      }
+      state.fireworksParticles = [];
+      dom.fireCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    }
+
+    // ===== 工具函数 =====
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+  </script>
+</body>
+</html>

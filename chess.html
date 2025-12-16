@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>豪华版中国象棋 - 人机对战</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f7;
+            --board-bg: #e8e8ed;
+            --line-color: rgba(0, 0, 0, 0.4);
+            --highlight-color: rgba(0, 122, 255, 0.2);
+            --selected-color: rgba(0, 122, 255, 0.6);
+            --last-move-color: rgba(52, 199, 89, 0.3);
+            --text-color: #1d1d1f;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --piece-red-bg: #fff;
+            --piece-red-text: #ff3b30;
+            --piece-black-bg: #fff;
+            --piece-black-text: #1d1d1f;
+            --piece-border: #d2d2d7;
+            --control-bg: rgba(255, 255, 255, 0.8);
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        }
+        
+        /* 
+           Apple Style Design System 
+           - Clean, Minimal, Blur, Soft Shadows
+        */
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.5s;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .header {
+            margin-bottom: 30px;
+            text-align: center;
+            width: 100%;
+            max-width: 720px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: var(--text-color);
+            opacity: 0.9;
+            text-shadow: none;
+        }
+
+        .controls-container {
+            background: var(--control-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 15px 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .status-bar {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button, select {
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-color);
+            border-radius: 12px;
+            transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        button:hover, select:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        select {
+            padding-right: 30px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        /* 棋盘容器 - 简约现代风 */
+        .board-container {
+            position: relative;
+            width: 720px;
+            height: 800px;
+            background-color: var(--board-bg);
+            /* 移除木纹，改为纯净质感 */
+            background-image: none; 
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 60px -10px rgba(0,0,0,0.15),
+                0 0 0 1px rgba(255,255,255,0.5) inset;
+            display: block;
+            padding: 0;
+            box-sizing: content-box;
+            margin: 0 auto;
+            overflow: hidden; /* 圆角 */
+        }
+
+        /* 棋子 - Apple 风格 (扁平带微立体) */
+        .piece {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background-color: var(--piece-black-bg);
+            color: var(--piece-black-text);
+            border: 1px solid rgba(0,0,0,0.1); /* 极细边框 */
+            box-shadow: 
+                0 4px 10px rgba(0,0,0,0.1),
+                0 1px 3px rgba(0,0,0,0.05),
+                inset 0 2px 4px rgba(255,255,255,0.8);
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 42px; /* 稍微调小字体更精致 */
+            font-weight: 500;
+            font-family: "KaiTi", "STKaiti", "楷体", serif; /* 棋子还是保留楷体更有韵味 */
+            cursor: pointer;
+            position: absolute;
+            z-index: 10;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            margin-left: -36px;
+            margin-top: -36px;
+            
+            background-image: linear-gradient(145deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .piece.red {
+            background-color: #fff;
+            color: #ff3b30;
+            text-shadow: none;
+        }
+
+        .piece.black {
+            background-color: #fff;
+            color: #1d1d1f;
+            text-shadow: none;
+        }
+        
+        /* 选中棋子 */
+        .piece.selected {
+            box-shadow: 0 0 0 4px var(--selected-color), 0 8px 20px rgba(0,0,0,0.2);
+            transform: scale(1.1);
+            z-index: 20;
+            animation: none; /* Apple 风格不喜欢一直闪烁 */
+            border-color: transparent;
+        }
+
+        /* 移动指示点 */
+        .dot {
+            width: 20px;
+            height: 20px;
+            background-color: rgba(52, 199, 89, 0.8); /* Apple Green */
+            border-radius: 50%;
+            position: absolute;
+            z-index: 5;
+            margin-left: -10px;
+            margin-top: -10px;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 2px 8px rgba(52, 199, 89, 0.4);
+            backdrop-filter: blur(4px);
+        }
+        
+        .dot:hover {
+            transform: scale(1.4);
+            background-color: #34c759;
+        }
+        
+        /* 上一次移动标记 */
+        .last-move-marker {
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            background-color: transparent;
+            border: 3px dashed var(--last-move-color);
+            border-radius: 50%;
+            margin-left: -36px;
+            margin-top: -36px;
+            z-index: 1;
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+
+        /* 楚河汉界 */
+        .river-text {
+            font-size: 36px;
+            fill: var(--text-color);
+            opacity: 0.3;
+            font-family: "KaiTi", "STKaiti", "楷体", serif;
+            font-weight: normal;
+        }
+
+        /* Modal/Toast */
+        .message-box {
+            position: fixed;
+            top: 100px; /* Top notification */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: #1d1d1f;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: 500;
+            z-index: 100;
+            display: none;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* --- THEMES --- */
+
+        /* 默认/经典 (Classic Wood but Modern) */
+        [data-theme="wood"] {
+            --bg-color: #f2f2f7;
+            --board-bg: #e3d0b9; /* 柔和的木色 */
+            --line-color: rgba(90, 60, 40, 0.6);
+            --piece-red-bg: #fffcf8;
+            --piece-black-bg: #fffcf8;
+        }
+
+        /* 水墨 (Ink/Monochrome) */
+        [data-theme="ink"] {
+            --bg-color: #ffffff;
+            --board-bg: #f5f5f7;
+            --line-color: rgba(0, 0, 0, 0.6);
+            --piece-red-text: #000; /* Black for red side too, distinguished by char or subtle ring? No, standard xiangqi uses red. Let's keep red but dark red. */
+            --piece-red-text: #a00;
+            --piece-black-text: #333;
+            --piece-red-bg: #fff;
+            --piece-black-bg: #fff;
+            --board-bg: #fff; /* White board */
+        }
+        [data-theme="ink"] .board-container {
+             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+             border: 1px solid #eee;
+        }
+
+        /* 暗夜 (Dark Mode) */
+        [data-theme="dark"] {
+            --bg-color: #000;
+            --board-bg: #1c1c1e;
+            --line-color: rgba(255, 255, 255, 0.2);
+            --text-color: #f5f5f7;
+            --control-bg: rgba(28, 28, 30, 0.8);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --piece-red-bg: #2c2c2e;
+            --piece-red-text: #ff453a;
+            --piece-black-bg: #2c2c2e;
+            --piece-black-text: #98989d;
+            --piece-border: #3a3a3c;
+            --highlight-color: rgba(10, 132, 255, 0.3);
+        }
+        [data-theme="dark"] button, [data-theme="dark"] select {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        [data-theme="dark"] select {
+             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        }
+        [data-theme="dark"] .piece {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            background-image: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 100%);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>中国象棋</h1>
+        
+        <div class="controls-container">
+            <div class="status-bar">
+                <span id="turn-display">红方走棋</span>
+            </div>
+            
+            <div class="controls">
+                <select id="difficulty-select">
+                    <option value="1">难度：入门</option>
+                    <option value="2">难度：业余</option>
+                    <option value="3" selected>难度：大师</option>
+                </select>
+                <select id="theme-select">
+                    <option value="wood">主题：经典</option>
+                    <option value="ink">主题：水墨</option>
+                    <option value="dark">主题：暗夜</option>
+                </select>
+                <div class="button-group">
+                    <button id="btn-restart">新局</button>
+                    <button id="btn-undo">悔棋</button>
+                    <button id="btn-sound">音效：开</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="board-container" id="board">
+        <!-- Width 720, Height 800 -->
+        <svg class="board-lines" width="720" height="800" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="var(--line-color)" stroke-width="2">
+                <!-- Outer Border (Optional visual, using CSS border instead) -->
+                
+                <!-- Horizontals (10 lines) -->
+                <!-- y = 40 + row * 80 -->
+                <!-- x: 40 to 680 -->
+                <line x1="40" y1="40" x2="680" y2="40" />
+                <line x1="40" y1="120" x2="680" y2="120" />
+                <line x1="40" y1="200" x2="680" y2="200" />
+                <line x1="40" y1="280" x2="680" y2="280" />
+                <line x1="40" y1="360" x2="680" y2="360" />
+                
+                <line x1="40" y1="440" x2="680" y2="440" />
+                <line x1="40" y1="520" x2="680" y2="520" />
+                <line x1="40" y1="600" x2="680" y2="600" />
+                <line x1="40" y1="680" x2="680" y2="680" />
+                <line x1="40" y1="760" x2="680" y2="760" />
+
+                <!-- Verticals (Outer) -->
+                <line x1="40" y1="40" x2="40" y2="760" />
+                <line x1="680" y1="40" x2="680" y2="760" />
+
+                <!-- Verticals (Inner - Broken at river) -->
+                <!-- x = 40 + col * 80. Cols 1 to 7 -->
+                <!-- Top: y 40 to 360 -->
+                <!-- Bottom: y 440 to 760 -->
+                
+                <!-- Col 1 (x=120) -->
+                <line x1="120" y1="40" x2="120" y2="360" />
+                <line x1="120" y1="440" x2="120" y2="760" />
+                <!-- Col 2 (x=200) -->
+                <line x1="200" y1="40" x2="200" y2="360" />
+                <line x1="200" y1="440" x2="200" y2="760" />
+                <!-- Col 3 (x=280) -->
+                <line x1="280" y1="40" x2="280" y2="360" />
+                <line x1="280" y1="440" x2="280" y2="760" />
+                <!-- Col 4 (x=360) -->
+                <line x1="360" y1="40" x2="360" y2="360" />
+                <line x1="360" y1="440" x2="360" y2="760" />
+                <!-- Col 5 (x=440) -->
+                <line x1="440" y1="40" x2="440" y2="360" />
+                <line x1="440" y1="440" x2="440" y2="760" />
+                <!-- Col 6 (x=520) -->
+                <line x1="520" y1="40" x2="520" y2="360" />
+                <line x1="520" y1="440" x2="520" y2="760" />
+                <!-- Col 7 (x=600) -->
+                <line x1="600" y1="40" x2="600" y2="360" />
+                <line x1="600" y1="440" x2="600" y2="760" />
+
+                <!-- Palaces (X shapes) -->
+                <!-- Top: (3,0)-(5,2) and (5,0)-(3,2) -->
+                <!-- x: 280, 440 -->
+                <!-- y: 40, 200 -->
+                <line x1="280" y1="40" x2="440" y2="200" />
+                <line x1="440" y1="40" x2="280" y2="200" />
+                
+                <!-- Bottom: (3,9)-(5,7) and (5,9)-(3,7) -->
+                <!-- y: 760, 600 -->
+                <line x1="280" y1="760" x2="440" y2="600" />
+                <line x1="440" y1="760" x2="280" y2="600" />
+            </g>
+            
+            <!-- River Text -->
+            <!-- Centered vertically in 360-440 (center 400) -->
+            <!-- x centers approx at 180 and 540 -->
+            <text x="140" y="415" class="river-text">楚  河</text>
+            <text x="460" y="415" class="river-text">汉  界</text>
+        </svg>
+    </div>
+
+    <!-- Controls moved to header -->
+
+    <div id="message-box" class="message-box"></div>
+
+<script>
+/**
+ * Chinese Chess (Xiangqi) Engine & UI
+ */
+
+// --- Constants ---
+const COLS = 9;
+const ROWS = 10;
+const CELL_SIZE = 80; // Expanded from 50
+const OFFSET_X = 40;  // Expanded from 25
+const OFFSET_Y = 40;
+
+const RED = 1;
+const BLACK = -1;
+const EMPTY = 0;
+
+// Piece Types
+const KING = 1;
+const ADVISOR = 2;
+const BISHOP = 3;
+const KNIGHT = 4;
+const ROOK = 5;
+const CANNON = 6;
+const PAWN = 7;
+
+// Characters map
+const CHARS = {
+    [RED]: {
+        [KING]: '帅', [ADVISOR]: '仕', [BISHOP]: '相', [KNIGHT]: '马',
+        [ROOK]: '车', [CANNON]: '炮', [PAWN]: '兵'
+    },
+    [BLACK]: {
+        [KING]: '将', [ADVISOR]: '士', [BISHOP]: '象', [KNIGHT]: '马',
+        [ROOK]: '车', [CANNON]: '炮', [PAWN]: '卒'
+    }
+};
+
+// --- Game State ---
+let board = [];
+let turn = RED;
+let gameOver = false;
+let history = [];
+let difficulty = 3;
+let soundEnabled = true;
+
+// --- Sound System ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+    if (!soundEnabled || audioCtx.state === 'suspended') {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        if(!soundEnabled) return;
+    }
+    
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    const now = audioCtx.currentTime;
+
+    if (type === 'select') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+        gainNode.gain.setValueAtTime(0.1, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+    } else if (type === 'move') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+        gainNode.gain.setValueAtTime(0.2, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+    } else if (type === 'capture') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+        gainNode.gain.setValueAtTime(0.2, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+    } else if (type === 'win') {
+        [440, 554, 659, 880].forEach((freq, i) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.frequency.value = freq;
+            g.gain.setValueAtTime(0.1, now + i*0.1);
+            g.gain.exponentialRampToValueAtTime(0.01, now + i*0.1 + 0.3);
+            o.start(now + i*0.1);
+            o.stop(now + i*0.1 + 0.3);
+        });
+    } else if (type === 'check') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.linearRampToValueAtTime(600, now + 0.2);
+        gainNode.gain.setValueAtTime(0.1, now);
+        gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+    }
+}
+
+// --- Board Initialization ---
+function initBoard() {
+    board = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
+    
+    // Setup pieces
+    const setup = [
+        { r: 0, c: 0, type: ROOK }, { r: 0, c: 1, type: KNIGHT }, { r: 0, c: 2, type: BISHOP }, { r: 0, c: 3, type: ADVISOR }, { r: 0, c: 4, type: KING },
+        { r: 0, c: 5, type: ADVISOR }, { r: 0, c: 6, type: BISHOP }, { r: 0, c: 7, type: KNIGHT }, { r: 0, c: 8, type: ROOK },
+        { r: 2, c: 1, type: CANNON }, { r: 2, c: 7, type: CANNON },
+        { r: 3, c: 0, type: PAWN }, { r: 3, c: 2, type: PAWN }, { r: 3, c: 4, type: PAWN }, { r: 3, c: 6, type: PAWN }, { r: 3, c: 8, type: PAWN },
+    ];
+
+    setup.forEach(p => {
+        board[p.r][p.c] = p.type * BLACK; // Top is Black
+        board[9 - p.r][p.c] = p.type * RED; // Bottom is Red
+    });
+
+    turn = RED;
+    gameOver = false;
+    history = [];
+    selectedPiece = null;
+    renderBoard();
+    updateStatus();
+    clearLastMove();
+}
+
+// --- Logic ---
+function getPiece(r, c) {
+    if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return 0;
+    return board[r][c];
+}
+
+function isValid(r, c) {
+    return r >= 0 && r < ROWS && c >= 0 && c < COLS;
+}
+
+function getPossibleMoves(r, c) {
+    const piece = board[r][c];
+    if (piece === 0) return [];
+    
+    const type = Math.abs(piece);
+    const side = piece > 0 ? RED : BLACK;
+    const moves = [];
+
+    const addMove = (nr, nc) => {
+        if (!isValid(nr, nc)) return;
+        const target = board[nr][nc];
+        if (target === 0 || (target > 0 ? RED : BLACK) !== side) {
+            moves.push({ r: nr, c: nc });
+        }
+    };
+
+    if (type === KING) {
+        const rMin = side === RED ? 7 : 0;
+        const rMax = side === RED ? 9 : 2;
+        const cMin = 3, cMax = 5;
+        [[r-1, c], [r+1, c], [r, c-1], [r, c+1]].forEach(([nr, nc]) => {
+            if (nr >= rMin && nr <= rMax && nc >= cMin && nc <= cMax) addMove(nr, nc);
+        });
+    } 
+    else if (type === ADVISOR) {
+        const rMin = side === RED ? 7 : 0;
+        const rMax = side === RED ? 9 : 2;
+        const cMin = 3, cMax = 5;
+        [[r-1, c-1], [r-1, c+1], [r+1, c-1], [r+1, c+1]].forEach(([nr, nc]) => {
+            if (nr >= rMin && nr <= rMax && nc >= cMin && nc <= cMax) addMove(nr, nc);
+        });
+    }
+    else if (type === BISHOP) {
+        const riverLimit = side === RED ? 5 : 4;
+        [[r-2, c-2], [r-2, c+2], [r+2, c-2], [r+2, c+2]].forEach(([nr, nc]) => {
+            if (side === RED && nr < 5) return;
+            if (side === BLACK && nr > 4) return;
+            const eyeR = (r + nr) / 2;
+            const eyeC = (c + nc) / 2;
+            if (isValid(eyeR, eyeC) && board[eyeR][eyeC] === 0) {
+                addMove(nr, nc);
+            }
+        });
+    }
+    else if (type === KNIGHT) {
+        const deltas = [[-2, -1], [-2, 1], [2, -1], [2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2]];
+        deltas.forEach(([dr, dc]) => {
+            const legR = r + (Math.abs(dr) === 2 ? dr/2 : 0);
+            const legC = c + (Math.abs(dc) === 2 ? dc/2 : 0);
+            if (isValid(legR, legC) && board[legR][legC] === 0) {
+                addMove(r + dr, c + dc);
+            }
+        });
+    }
+    else if (type === ROOK) {
+        [[0, 1], [0, -1], [1, 0], [-1, 0]].forEach(([dr, dc]) => {
+            let nr = r + dr, nc = c + dc;
+            while (isValid(nr, nc)) {
+                const target = board[nr][nc];
+                if (target === 0) {
+                    moves.push({ r: nr, c: nc });
+                } else {
+                    if ((target > 0 ? RED : BLACK) !== side) moves.push({ r: nr, c: nc });
+                    break;
+                }
+                nr += dr; nc += dc;
+            }
+        });
+    }
+    else if (type === CANNON) {
+        [[0, 1], [0, -1], [1, 0], [-1, 0]].forEach(([dr, dc]) => {
+            let nr = r + dr, nc = c + dc;
+            let jumped = false;
+            while (isValid(nr, nc)) {
+                const target = board[nr][nc];
+                if (!jumped) {
+                    if (target === 0) {
+                        moves.push({ r: nr, c: nc });
+                    } else {
+                        jumped = true;
+                    }
+                } else {
+                    if (target !== 0) {
+                        if ((target > 0 ? RED : BLACK) !== side) moves.push({ r: nr, c: nc });
+                        break;
+                    }
+                }
+                nr += dr; nc += dc;
+            }
+        });
+    }
+    else if (type === PAWN) {
+        const forward = side === RED ? -1 : 1;
+        addMove(r + forward, c);
+        const overRiver = side === RED ? r < 5 : r > 4;
+        if (overRiver) {
+            addMove(r, c - 1);
+            addMove(r, c + 1);
+        }
+    }
+
+    return moves;
+}
+
+function isMoveLegal(move, side) {
+    const saved = board[move.to.r][move.to.c];
+    const piece = board[move.from.r][move.from.c];
+    
+    board[move.to.r][move.to.c] = piece;
+    board[move.from.r][move.from.c] = 0;
+
+    const kPos = findKing(side);
+    const inCheck = isChecked(kPos.r, kPos.c, side);
+    const flying = isFlyingGeneral();
+
+    board[move.from.r][move.from.c] = piece;
+    board[move.to.r][move.to.c] = saved;
+
+    return !inCheck && !flying;
+}
+
+function findKing(side) {
+    for(let r=0; r<ROWS; r++) {
+        for(let c=0; c<COLS; c++) {
+            if (board[r][c] === side * KING) return {r, c};
+        }
+    }
+    return {r: 0, c: 0};
+}
+
+function isChecked(kr, kc, side) {
+    const enemy = side === RED ? BLACK : RED;
+    const dirs = [[0,1], [0,-1], [1,0], [-1,0]];
+    for (let d of dirs) {
+        let jumped = false;
+        let r = kr + d[0], c = kc + d[1];
+        while (isValid(r, c)) {
+            const p = board[r][c];
+            if (p !== 0) {
+                const pType = Math.abs(p);
+                const pSide = p > 0 ? RED : BLACK;
+                if (pSide === enemy) {
+                    if (!jumped) {
+                        if (pType === ROOK || pType === KING || (pType === PAWN && Math.abs(kr - r) + Math.abs(kc - c) === 1)) return true;
+                    } else {
+                        if (pType === CANNON) return true;
+                    }
+                }
+                if (!jumped) jumped = true; else break;
+            }
+            r += d[0]; c += d[1];
+        }
+    }
+
+    const knightMoves = [[-2,-1],[-2,1],[2,-1],[2,1],[-1,-2],[-1,2],[1,-2],[1,2]];
+    for (let m of knightMoves) {
+        const nr = kr + m[0], nc = kc + m[1];
+        if (isValid(nr, nc)) {
+            const p = board[nr][nc];
+            if (p !== 0 && (p > 0 ? RED : BLACK) === enemy && Math.abs(p) === KNIGHT) {
+                const lr = kr + (Math.abs(m[0])===2 ? m[0]/2 : 0);
+                const lc = kc + (Math.abs(m[1])===2 ? m[1]/2 : 0);
+                if (board[lr][lc] === 0) return true;
+            }
+        }
+    }
+    return false;
+}
+
+function isFlyingGeneral() {
+    let rK = findKing(RED);
+    let bK = findKing(BLACK);
+    if (rK.c !== bK.c) return false;
+    for (let r = bK.r + 1; r < rK.r; r++) {
+        if (board[r][rK.c] !== 0) return false;
+    }
+    return true;
+}
+
+function getAllLegalMoves(side) {
+    let moves = [];
+    for (let r=0; r<ROWS; r++) {
+        for (let c=0; c<COLS; c++) {
+            if (board[r][c] !== 0 && (board[r][c] > 0 ? RED : BLACK) === side) {
+                const possibles = getPossibleMoves(r, c);
+                possibles.forEach(to => {
+                    if (isMoveLegal({from: {r, c}, to}, side)) {
+                        moves.push({from: {r, c}, to});
+                    }
+                });
+            }
+        }
+    }
+    return moves;
+}
+
+// --- AI Engine ---
+const PIECE_VALUES = {
+    [KING]: 10000,
+    [ROOK]: 900,
+    [KNIGHT]: 450,
+    [CANNON]: 450,
+    [BISHOP]: 200,
+    [ADVISOR]: 200,
+    [PAWN]: 100
+};
+
+const PAWN_BONUS = [
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [20,20,20,20,20,20,20,20,20],
+    [10,10,20,30,30,20,10,10,10],
+    [10,10,10,20,20,10,10,10,10],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0]
+];
+
+function evaluate(b) {
+    let score = 0;
+    for(let r=0; r<ROWS; r++) {
+        for(let c=0; c<COLS; c++) {
+            const p = b[r][c];
+            if (p === 0) continue;
+            const type = Math.abs(p);
+            const val = PIECE_VALUES[type];
+            if (p > 0) { // RED
+                score += val;
+                if (type === PAWN) score += PAWN_BONUS[9-r][c]; 
+            } else { // BLACK
+                score -= val;
+                if (type === PAWN) score -= PAWN_BONUS[r][c];
+            }
+        }
+    }
+    return score;
+}
+
+function minimax(depth, alpha, beta, isMaximizing) {
+    if (depth === 0) return evaluate(board);
+
+    const side = isMaximizing ? RED : BLACK;
+    const moves = getAllLegalMoves(side);
+    
+    if (moves.length === 0) return isMaximizing ? -20000 : 20000;
+
+    moves.sort((a, b) => {
+        const valA = Math.abs(board[a.to.r][a.to.c]);
+        const valB = Math.abs(board[b.to.r][b.to.c]);
+        return valB - valA;
+    });
+
+    if (isMaximizing) {
+        let maxEval = -Infinity;
+        for (let move of moves) {
+            const captured = board[move.to.r][move.to.c];
+            const moved = board[move.from.r][move.from.c];
+            board[move.to.r][move.to.c] = moved;
+            board[move.from.r][move.from.c] = 0;
+            
+            const eval = minimax(depth - 1, alpha, beta, false);
+            
+            board[move.from.r][move.from.c] = moved;
+            board[move.to.r][move.to.c] = captured;
+
+            maxEval = Math.max(maxEval, eval);
+            alpha = Math.max(alpha, eval);
+            if (beta <= alpha) break;
+        }
+        return maxEval;
+    } else {
+        let minEval = Infinity;
+        for (let move of moves) {
+            const captured = board[move.to.r][move.to.c];
+            const moved = board[move.from.r][move.from.c];
+            board[move.to.r][move.to.c] = moved;
+            board[move.from.r][move.from.c] = 0;
+            
+            const eval = minimax(depth - 1, alpha, beta, true);
+            
+            board[move.from.r][move.from.c] = moved;
+            board[move.to.r][move.to.c] = captured;
+
+            minEval = Math.min(minEval, eval);
+            beta = Math.min(beta, eval);
+            if (beta <= alpha) break;
+        }
+        return minEval;
+    }
+}
+
+function aiMove() {
+    if (gameOver || turn === RED) return;
+
+    setTimeout(() => {
+        let depth = difficulty === 1 ? 1 : (difficulty === 2 ? 2 : 3);
+        const moves = getAllLegalMoves(BLACK);
+        if (moves.length === 0) {
+            endGame(RED);
+            return;
+        }
+
+        let bestMove = null;
+        let bestVal = Infinity;
+
+        if (difficulty === 1) {
+            const captures = moves.filter(m => board[m.to.r][m.to.c] !== 0);
+            if (captures.length > 0 && Math.random() > 0.3) {
+                bestMove = captures[Math.floor(Math.random() * captures.length)];
+            } else {
+                bestMove = moves[Math.floor(Math.random() * moves.length)];
+            }
+        } else {
+            for (let move of moves) {
+                const captured = board[move.to.r][move.to.c];
+                const moved = board[move.from.r][move.from.c];
+                board[move.to.r][move.to.c] = moved;
+                board[move.from.r][move.from.c] = 0;
+                
+                const val = minimax(depth, -Infinity, Infinity, true);
+                
+                board[move.from.r][move.from.c] = moved;
+                board[move.to.r][move.to.c] = captured;
+
+                if (val < bestVal) {
+                    bestVal = val;
+                    bestMove = move;
+                }
+            }
+        }
+        
+        if (bestMove) {
+            executeMove(bestMove);
+        } else {
+            endGame(RED);
+        }
+    }, 100);
+}
+
+// --- UI Controller ---
+
+let selectedPiece = null;
+const boardEl = document.getElementById('board');
+
+function renderBoard() {
+    const oldPieces = document.querySelectorAll('.piece, .dot, .last-move-marker');
+    oldPieces.forEach(el => el.remove());
+
+    if (history.length > 0) {
+        const last = history[history.length - 1];
+        const m1 = document.createElement('div');
+        m1.className = 'last-move-marker';
+        m1.style.left = (last.from.c * CELL_SIZE + OFFSET_X) + 'px';
+        m1.style.top = (last.from.r * CELL_SIZE + OFFSET_Y) + 'px';
+        boardEl.appendChild(m1);
+        const m2 = document.createElement('div');
+        m2.className = 'last-move-marker';
+        m2.style.left = (last.to.c * CELL_SIZE + OFFSET_X) + 'px';
+        m2.style.top = (last.to.r * CELL_SIZE + OFFSET_Y) + 'px';
+        boardEl.appendChild(m2);
+    }
+
+    for(let r=0; r<ROWS; r++) {
+        for(let c=0; c<COLS; c++) {
+            const p = board[r][c];
+            if (p !== 0) {
+                const el = document.createElement('div');
+                el.className = `piece ${p > 0 ? 'red' : 'black'}`;
+                el.textContent = CHARS[p > 0 ? RED : BLACK][Math.abs(p)];
+                el.style.left = (c * CELL_SIZE + OFFSET_X) + 'px';
+                el.style.top = (r * CELL_SIZE + OFFSET_Y) + 'px';
+                el.dataset.r = r;
+                el.dataset.c = c;
+                
+                el.onclick = (e) => handlePieceClick(r, c, e);
+                
+                if (selectedPiece && selectedPiece.r === r && selectedPiece.c === c) {
+                    el.classList.add('selected');
+                }
+                boardEl.appendChild(el);
+            }
+        }
+    }
+
+    if (selectedPiece && !gameOver && turn === RED) {
+        const moves = getPossibleMoves(selectedPiece.r, selectedPiece.c);
+        moves.forEach(m => {
+            if (isMoveLegal({from: selectedPiece, to: m}, turn)) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.style.left = (m.c * CELL_SIZE + OFFSET_X) + 'px';
+                dot.style.top = (m.r * CELL_SIZE + OFFSET_Y) + 'px';
+                dot.onclick = () => handleMoveClick(m.r, m.c);
+                boardEl.appendChild(dot);
+            }
+        });
+    }
+}
+
+function handlePieceClick(r, c, e) {
+    if (gameOver) return;
+    if (turn !== RED) return;
+
+    const p = board[r][c];
+    if (p > 0) {
+        selectedPiece = {r, c};
+        playSound('select');
+        renderBoard();
+        e.stopPropagation();
+    } else {
+        if (selectedPiece) {
+            handleMoveClick(r, c);
+        }
+    }
+}
+
+function handleMoveClick(r, c) {
+    if (!selectedPiece) return;
+    
+    const moves = getPossibleMoves(selectedPiece.r, selectedPiece.c);
+    const valid = moves.find(m => m.r === r && m.c === c);
+    
+    if (valid && isMoveLegal({from: selectedPiece, to: {r, c}}, turn)) {
+        executeMove({from: selectedPiece, to: {r, c}});
+    } else {
+        selectedPiece = null;
+        renderBoard();
+    }
+}
+
+function executeMove(move) {
+    const fromP = board[move.from.r][move.from.c];
+    const toP = board[move.to.r][move.to.c];
+    
+    history.push({
+        from: {...move.from},
+        to: {...move.to},
+        captured: toP,
+        moved: fromP
+    });
+
+    board[move.to.r][move.to.c] = fromP;
+    board[move.from.r][move.from.c] = 0;
+    
+    selectedPiece = null;
+    
+    if (toP !== 0) playSound('capture');
+    else playSound('move');
+
+    const enemy = turn === RED ? BLACK : RED;
+    if (isChecked(findKing(enemy).r, findKing(enemy).c, enemy)) {
+        playSound('check');
+        showMessage(turn === RED ? "将军！" : "AI 将军！", 1000);
+    }
+
+    turn = enemy;
+    renderBoard();
+    updateStatus();
+
+    const moves = getAllLegalMoves(turn);
+    if (moves.length === 0) {
+        endGame(turn === RED ? BLACK : RED);
+    } else {
+        if (turn === BLACK) {
+            setTimeout(aiMove, 500);
+        }
+    }
+}
+
+function undoMove() {
+    if (history.length < 2 || turn !== RED || gameOver) return;
+    
+    const blackMove = history.pop();
+    board[blackMove.from.r][blackMove.from.c] = blackMove.moved;
+    board[blackMove.to.r][blackMove.to.c] = blackMove.captured;
+
+    const redMove = history.pop();
+    board[redMove.from.r][redMove.from.c] = redMove.moved;
+    board[redMove.to.r][redMove.to.c] = redMove.captured;
+
+    turn = RED;
+    selectedPiece = null;
+    gameOver = false;
+    renderBoard();
+    updateStatus();
+}
+
+function updateStatus() {
+    const el = document.getElementById('turn-display');
+    if (gameOver) return;
+    el.textContent = turn === RED ? "红方走棋" : "AI 思考中...";
+    el.style.color = turn === RED ? "var(--piece-red-text)" : "var(--text-color)";
+}
+
+function endGame(winner) {
+    gameOver = true;
+    playSound('win');
+    const msg = winner === RED ? "红方获胜！" : "黑方获胜！";
+    showMessage(msg);
+    document.getElementById('turn-display').textContent = msg;
+}
+
+function showMessage(text, duration = 0) {
+    const box = document.getElementById('message-box');
+    box.textContent = text;
+    box.style.display = 'block';
+    if (duration > 0) {
+        setTimeout(() => {
+            box.style.display = 'none';
+        }, duration);
+    } else {
+        box.onclick = () => box.style.display = 'none';
+    }
+}
+
+function clearLastMove() {
+    const markers = document.querySelectorAll('.last-move-marker');
+    markers.forEach(m => m.remove());
+}
+
+document.getElementById('btn-restart').onclick = () => {
+    if (confirm("确定要重新开始吗？")) {
+        initBoard();
+        document.getElementById('message-box').style.display = 'none';
+    }
+};
+
+document.getElementById('btn-undo').onclick = undoMove;
+
+document.getElementById('theme-select').onchange = (e) => {
+    document.body.setAttribute('data-theme', e.target.value);
+};
+
+document.getElementById('difficulty-select').onchange = (e) => {
+    difficulty = parseInt(e.target.value);
+};
+
+const btnSound = document.getElementById('btn-sound');
+btnSound.onclick = () => {
+    soundEnabled = !soundEnabled;
+    btnSound.textContent = soundEnabled ? "音效：开" : "音效：关";
+    if (soundEnabled && audioCtx.state === 'suspended') audioCtx.resume();
+};
+
+initBoard();
+
+boardEl.onclick = (e) => {
+    // If clicking on SVG or Board Background, try to move if a piece is selected
+    if (e.target === boardEl || e.target.tagName === 'svg' || e.target.tagName === 'line' || e.target.tagName === 'rect') {
+        if (selectedPiece && !gameOver && turn === RED) {
+            const rect = boardEl.getBoundingClientRect();
+            const x = e.clientX - rect.left - OFFSET_X;
+            const y = e.clientY - rect.top - OFFSET_Y;
+            
+            // Find nearest grid point
+            const c = Math.round(x / CELL_SIZE);
+            const r = Math.round(y / CELL_SIZE);
+            
+            // Check if valid coordinate
+            if (c >= 0 && c < COLS && r >= 0 && r < ROWS) {
+                // Check distance to center to prevent misclicks (optional, but good for UX)
+                const centerX = c * CELL_SIZE;
+                const centerY = r * CELL_SIZE;
+                const dist = Math.sqrt((x-centerX)**2 + (y-centerY)**2);
+                
+                if (dist < CELL_SIZE * 0.45) { // Within 45% of cell size radius
+                     handleMoveClick(r, c);
+                     return;
+                }
+            }
+        }
+        
+        // If logic fell through, deselect
+        selectedPiece = null;
+        renderBoard();
+    }
+};
+</script>
+</body>
+</html>
