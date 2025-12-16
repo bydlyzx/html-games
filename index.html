@@ -1,25 +1,220 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>我的 HTML 小游戏合集</title>
+    <meta charset="UTF-8" />
+    <title>🎮 经典怀旧小游戏大厅</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: radial-gradient(circle at top, #1b2735, #090a0f 70%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 星空动画背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 200px 120px, #fff, transparent),
+                radial-gradient(1px 1px at 400px 300px, #fff, transparent),
+                radial-gradient(1.5px 1.5px at 600px 80px, #fff, transparent),
+                radial-gradient(1px 1px at 800px 200px, #fff, transparent);
+            background-size: 1000px 600px;
+            animation: stars 60s linear infinite;
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        @keyframes stars {
+            from { transform: translateY(0); }
+            to { transform: translateY(-600px); }
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+        }
+
+        header h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #cbd5e1;
+            font-size: 1rem;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            position: relative;
+            background: linear-gradient(145deg, #1f2937, #111827);
+            border-radius: 20px;
+            padding: 24px 20px 28px;
+            text-decoration: none;
+            color: #fff;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.15), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .card:hover::after {
+            opacity: 1;
+        }
+
+        .icon {
+            font-size: 2.8rem;
+            margin-bottom: 14px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .desc {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px 30px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        footer span {
+            color: #38bdf8;
+        }
+    </style>
 </head>
 <body>
-    <h1>🎮 经典怀旧小游戏</h1>
 
-    <ul>
-        <li><a href="2048.html" target="_blank">2048</a></li>
-        <li><a href="block.html" target="_blank">打砖块</a></li>
-        <li><a href="snake.html" target="_blank">贪吃蛇</a></li>
-		<li><a href="card.html" target="_blank">单词消消乐</a></li>
-        <li><a href="chess.html" target="_blank">中国象棋大战</a></li>
-        <li><a href="dragon.html" target="_blank">泡泡龙</a></li>
-		<li><a href="five.html" target="_blank">五子棋</a></li>
-        <li><a href="fruit.html" target="_blank">水果忍者</a></li>
-        <li><a href="tank.html" target="_blank">坦克大战</a></li>
-		<li><a href="tank.html" target="_blank">坦克大战</a></li>
-		<li><a href="thunder.html" target="_blank">雷电打飞机</a></li>
-    </ul>
+<header>
+    <h1>🎮 经典怀旧小游戏</h1>
+    <p>HTML · 童年 · 情怀 · 即点即玩</p>
+</header>
+
+<main>
+    <div class="grid">
+        <a class="card" href="2048.html" target="_blank">
+            <div class="icon">🔢</div>
+            <div class="title">2048</div>
+            <div class="desc">数字合成，停不下来</div>
+        </a>
+
+        <a class="card" href="block.html" target="_blank">
+            <div class="icon">🧱</div>
+            <div class="title">打砖块</div>
+            <div class="desc">经典街机，反弹快感</div>
+        </a>
+
+        <a class="card" href="snake.html" target="_blank">
+            <div class="icon">🐍</div>
+            <div class="title">贪吃蛇</div>
+            <div class="desc">越吃越长的快乐</div>
+        </a>
+
+        <a class="card" href="card.html" target="_blank">
+            <div class="icon">🃏</div>
+            <div class="title">单词消消乐</div>
+            <div class="desc">记忆与速度的较量</div>
+        </a>
+
+        <a class="card" href="chess.html" target="_blank">
+            <div class="icon">♟️</div>
+            <div class="title">中国象棋大战</div>
+            <div class="desc">楚河汉界，智者对弈</div>
+        </a>
+
+        <a class="card" href="dragon.html" target="_blank">
+            <div class="icon">🫧</div>
+            <div class="title">泡泡龙</div>
+            <div class="desc">消除强迫症福音</div>
+        </a>
+
+        <a class="card" href="five.html" target="_blank">
+            <div class="icon">⚫</div>
+            <div class="title">五子棋</div>
+            <div class="desc">一步定胜负</div>
+        </a>
+
+        <a class="card" href="fruit.html" target="_blank">
+            <div class="icon">🍉</div>
+            <div class="title">水果忍者</div>
+            <div class="desc">切水果的爽感</div>
+        </a>
+
+        <a class="card" href="tank.html" target="_blank">
+            <div class="icon">🛡️</div>
+            <div class="title">坦克大战</div>
+            <div class="desc">钢铁洪流正面刚</div>
+        </a>
+
+        <a class="card" href="thunder.html" target="_blank">
+            <div class="icon">✈️</div>
+            <div class="title">雷电打飞机</div>
+            <div class="desc">纵版射击的浪漫</div>
+        </a>
+    </div>
+</main>
+
+<footer>
+    © 2025 · <span>HTML 怀旧小游戏合集</span>
+</footer>
 
 </body>
 </html>
