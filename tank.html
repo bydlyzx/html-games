@@ -634,7 +634,7 @@ class Bullet extends GameObject {
 
         const cx = this.x + this.w / 2;
         const cy = this.y + this.h / 2;
-        const tile = Map.getTileAt(cx, cy);
+        const tile = GameMap.getTileAt(cx, cy);
         if (tile === TILE.BASE) {
             const isEnemyBullet = this.owner instanceof EnemyTank;
             this.markedForDeletion = true;
@@ -645,7 +645,7 @@ class Bullet extends GameObject {
             return;
         }
 
-        const hit = Map.checkBulletCollision(this);
+        const hit = GameMap.checkBulletCollision(this);
         if (hit) {
             this.markedForDeletion = true;
             if (hit === TILE.BRICK) AudioSys.hitBrick();
@@ -718,17 +718,17 @@ class Tank extends GameObject {
             else if (this.dir === DIR.RIGHT) nextX += this.speed;
 
             const rect = { x: nextX, y: nextY, w: this.w, h: this.h };
-            if (!Map.checkCollision(rect) && !Game.checkTankCollision(this, rect)) {
+            if (!GameMap.checkCollision(rect) && !Game.checkTankCollision(this, rect)) {
                 this.x = nextX;
                 this.y = nextY;
                 
                 // 吸附网格
                 if (this.dir === DIR.UP || this.dir === DIR.DOWN) {
                     const gridX = Math.round(this.x / TILE_SIZE) * TILE_SIZE;
-                    if (Math.abs(this.x - gridX) < 6) this.x = gridX;
+                    if (Math.abs(this.x - gridX) < 10) this.x = gridX;
                 } else {
                     const gridY = Math.round(this.y / TILE_SIZE) * TILE_SIZE;
-                    if (Math.abs(this.y - gridY) < 6) this.y = gridY;
+                    if (Math.abs(this.y - gridY) < 10) this.y = gridY;
                 }
             } else {
                 this.onCollision();
@@ -795,10 +795,10 @@ class PlayerTank extends Tank {
         this.texture = Assets.textures.player;
         this.hp = 1;
         this.isPlayer = true;
-        this.speed = 3;
+        this.speed = 3.5;
     }
     update() {
-        this.speed = Game.effects.speed > 0 ? 4.2 : 3;
+        this.speed = Game.effects.speed > 0 ? 4.5 : 3.5;
         this.moving = false;
         let newDir = -1;
         
@@ -881,25 +881,29 @@ class EnemyTank extends Tank {
         super.update();
 
         const aim = this.getAimTarget();
-        const aligned = aim && (Math.abs(aim.x - this.x) < TILE_SIZE * 0.3 || Math.abs(aim.y - this.y) < TILE_SIZE * 0.3);
+        const cx = this.x + this.w / 2;
+        const cy = this.y + this.h / 2;
+        const aligned = aim && (Math.abs(aim.x - cx) < TILE_SIZE * 0.3 || Math.abs(aim.y - cy) < TILE_SIZE * 0.3);
         if (aligned) {
-            const desired = Math.abs(aim.x - cx) > Math.abs(aim.y - cy)
-                ? (aim.x > cx ? DIR.RIGHT : DIR.LEFT)
-                : (aim.y > cy ? DIR.DOWN : DIR.UP);
+            const dx = aim.x - cx;
+            const dy = aim.y - cy;
+            const desired = Math.abs(dx) > Math.abs(dy)
+                ? (dx > 0 ? DIR.RIGHT : DIR.LEFT)
+                : (dy > 0 ? DIR.DOWN : DIR.UP);
             if (this.dir !== desired) {
                 this.dir = desired;
             } else {
                 if (this.aimTimer-- <= 0) {
-                    this.aimTimer = this.type === 3 ? 10 : 18;
-                    const los = Map.hasLineOfSight(this, desired);
+                    this.aimTimer = this.type === 3 ? 15 : 25;
+                    const los = GameMap.hasLineOfSight(this, desired);
                     if (los) {
-                        const p = this.type === 3 ? 0.35 : 0.18;
+                        const p = this.type === 3 ? 0.25 : 0.1;
                         if (Math.random() < p) this.shoot();
                     }
                 }
             }
         } else {
-            if (Math.random() < 0.02) this.shoot();
+            if (Math.random() < 0.005) this.shoot();
         }
     }
     chooseDirection() {
@@ -1015,7 +1019,7 @@ class PowerUp extends GameObject {
 }
 
 // --- 地图与物理 ---
-const Map = {
+const GameMap = {
     grid: [],
     fortifyBackup: null,
     init: function(stage = 1) {
@@ -1279,6 +1283,11 @@ const Game = {
         }
     },
     
+    lastTime: 0,
+    accumulator: 0,
+    timeStep: 1000 / 60,
+    _boundLoop: null,
+
     start: function() {
         AudioSys.init();
         Assets.generate();
@@ -1303,19 +1312,21 @@ const Game = {
         document.getElementById('game-over-screen').classList.add('hidden');
         document.getElementById('victory-screen').classList.add('hidden');
         
-        requestAnimationFrame(this.loop);
+        this.lastTime = performance.now();
+        this.accumulator = 0;
+        if (!this._boundLoop) this._boundLoop = this.loop.bind(this);
+        requestAnimationFrame(this._boundLoop);
     },
     
     resetLevel: function() {
-        Map.init(this.stage);
+        GameMap.init(this.stage);
         this.tanks = [];
         this.bullets = [];
         this.particles = [];
         this.powerUps = [];
         
-        // 玩家出生
         this.player = new PlayerTank(9 * TILE_SIZE, 24 * TILE_SIZE);
-        this.player.invuln = 60 * 2;
+        this.player.invuln = 60 * 3;
         this.tanks.push(this.player);
         
         // 敌人设置
@@ -1334,14 +1345,25 @@ const Game = {
     loop: function(timestamp) {
         if (!gameRunning) return;
         
-        // 限制帧率
-        // (简单起见，这里每帧都跑，实际应计算delta)
+        const deltaTime = timestamp - Game.lastTime;
+        Game.lastTime = timestamp;
+
+        if (deltaTime > 1000) {
+            Game.accumulator = 0;
+            requestAnimationFrame(Game._boundLoop);
+            return;
+        }
+
+        Game.accumulator += deltaTime;
+
+        while (Game.accumulator >= Game.timeStep) {
+            Game.update();
+            Game.accumulator -= Game.timeStep;
+            frameCount++;
+        }
         
-        Game.update();
         Game.draw();
-        
-        frameCount++;
-        requestAnimationFrame(Game.loop);
+        requestAnimationFrame(Game._boundLoop);
     },
     
     update: function() {
@@ -1357,16 +1379,16 @@ const Game = {
         }
 
         if (this.effects.fortify > 0) {
-            if (!Map.fortifyBackup) Map.applyFortify();
-        } else if (Map.fortifyBackup) {
-            Map.restoreFortify();
+            if (!GameMap.fortifyBackup) GameMap.applyFortify();
+        } else if (GameMap.fortifyBackup) {
+            GameMap.restoreFortify();
         }
 
         if (!this.player && this.respawnTimer > 0) {
             this.respawnTimer--;
             if (this.respawnTimer <= 0 && this.lives > 0 && this.baseAlive) {
                 this.player = new PlayerTank(9 * TILE_SIZE, 24 * TILE_SIZE);
-                this.player.invuln = 60 * 2;
+                this.player.invuln = 60 * 3;
                 this.tanks.push(this.player);
             }
         }
@@ -1435,7 +1457,7 @@ const Game = {
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        Map.draw(ctx);
+        GameMap.draw(ctx);
         
         // 先画尸体/痕迹 (可选)
         
@@ -1443,7 +1465,7 @@ const Game = {
         this.bullets.forEach(b => b.draw(ctx));
         this.particles.forEach(p => p.draw(ctx));
         this.powerUps.forEach(p => p.draw(ctx));
-        Map.drawGrass(ctx);
+        GameMap.drawGrass(ctx);
     },
 
     getBaseCenter: function() {
@@ -1545,8 +1567,8 @@ const Game = {
     baseDestroyed: function() {
         if (!this.baseAlive) return;
         this.baseAlive = false;
-        Map.grid[25][12] = TILE.EMPTY;
-        Map.grid[25][13] = TILE.EMPTY;
+        GameMap.grid[25][12] = TILE.EMPTY;
+        GameMap.grid[25][13] = TILE.EMPTY;
         this.spawnExplosion(13 * TILE_SIZE, 25 * TILE_SIZE, 1);
         this.gameOver();
     },
