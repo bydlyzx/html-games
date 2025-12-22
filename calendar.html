@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万年历 - 传统与现代的融合</title>
+    <style>
+        :root {
+            /* 默认主题变量占位 */
+            --primary-color: #C93756;
+            --primary-gradient-start: #C93756;
+            --primary-gradient-end: #A01830;
+            --secondary-color: #D4AF37;
+            --bg-color: #FDFBF7;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --text-secondary: #666666;
+            --border-color: #E0E0E0;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 30px rgba(201, 55, 86, 0.15);
+            --weekend-color: #FF6B6B;
+            --today-bg: rgba(201, 55, 86, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-main: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+            --font-serif: "Songti SC", "SimSun", serif;
+        }
+
+        /* 主题定义 */
+        /* 1. 赤 (Red - 丹砂/朱砂) - 默认 */
+        [data-theme="red"] {
+            --primary-color: #C93756;
+            --primary-gradient-start: #E64B65;
+            --primary-gradient-end: #A01830;
+            --secondary-color: #D4AF37;
+            --bg-color: #FFF0F2; /* 极淡的樱花红 */
+            --shadow-hover: 0 10px 30px rgba(201, 55, 86, 0.25);
+            --today-bg: rgba(201, 55, 86, 0.1);
+            --weekend-color: #FF6B6B;
+        }
+        
+        /* 2. 橙 (Orange - 雄黄/橘黄) */
+        [data-theme="orange"] {
+            --primary-color: #FF7F50;
+            --primary-gradient-start: #FF9F43;
+            --primary-gradient-end: #E65100;
+            --secondary-color: #2E86DE;
+            --bg-color: #FFF5EB; /* 极淡的杏色 */
+            --shadow-hover: 0 10px 30px rgba(255, 127, 80, 0.25);
+            --today-bg: rgba(255, 127, 80, 0.1);
+            --weekend-color: #FF9F43;
+        }
+
+        /* 3. 黄 (Yellow - 槐黄/明黄) */
+        [data-theme="yellow"] {
+            --primary-color: #FBC531;
+            --primary-gradient-start: #FDCB6E;
+            --primary-gradient-end: #D4AC0D;
+            --secondary-color: #E17055;
+            --bg-color: #FEF9E7; /* 极淡的米黄 */
+            --shadow-hover: 0 10px 30px rgba(251, 197, 49, 0.25);
+            --today-bg: rgba(251, 197, 49, 0.15);
+            --weekend-color: #E17055;
+        }
+
+        /* 4. 绿 (Green - 翡翠/竹青) */
+        [data-theme="green"] {
+            --primary-color: #27AE60;
+            --primary-gradient-start: #2ECC71;
+            --primary-gradient-end: #145A32;
+            --secondary-color: #F1C40F;
+            --bg-color: #F0F9F4; /* 极淡的薄荷绿 */
+            --shadow-hover: 0 10px 30px rgba(39, 174, 96, 0.25);
+            --today-bg: rgba(39, 174, 96, 0.1);
+            --weekend-color: #E67E22;
+        }
+
+        /* 5. 青 (Cyan - 靛青/天青) */
+        [data-theme="cyan"] {
+            --primary-color: #00B894;
+            --primary-gradient-start: #55EFC4;
+            --primary-gradient-end: #006266;
+            --secondary-color: #E84393;
+            --bg-color: #E8F8F5; /* 极淡的冰青色 */
+            --shadow-hover: 0 10px 30px rgba(0, 184, 148, 0.25);
+            --today-bg: rgba(0, 184, 148, 0.1);
+            --weekend-color: #FF7675;
+        }
+
+        /* 6. 蓝 (Blue - 景泰蓝/宝蓝) */
+        [data-theme="blue"] {
+            --primary-color: #0984E3;
+            --primary-gradient-start: #74B9FF;
+            --primary-gradient-end: #0C2461;
+            --secondary-color: #FDCB6E;
+            --bg-color: #F0F7FA; /* 极淡的云水蓝 */
+            --shadow-hover: 0 10px 30px rgba(9, 132, 227, 0.25);
+            --today-bg: rgba(9, 132, 227, 0.1);
+            --weekend-color: #D63031;
+        }
+
+        /* 7. 紫 (Purple - 紫檀/罗兰) */
+        [data-theme="purple"] {
+            --primary-color: #8E44AD;
+            --primary-gradient-start: #A29BFE;
+            --primary-gradient-end: #4834D4;
+            --secondary-color: #00CEC9;
+            --bg-color: #F8F0FA; /* 极淡的薰衣草紫 */
+            --shadow-hover: 0 10px 30px rgba(142, 68, 173, 0.25);
+            --today-bg: rgba(142, 68, 173, 0.1);
+            --weekend-color: #FAB1A0;
+        }
+
+        /* 8. 灰 (Gray - 水墨/玄灰 - Dark Mode) */
+        [data-theme="gray"] {
+            --primary-color: #636E72;
+            --primary-gradient-start: #57606F;
+            --primary-gradient-end: #2F3542;
+            --secondary-color: #A4B0BE;
+            --bg-color: #1E1E1E;
+            --card-bg: #2D3436;
+            --text-main: #DFE4EA;
+            --text-secondary: #B2BEC3;
+            --border-color: #4A5568;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.6);
+            --weekend-color: #FF7675;
+            --today-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: background-color 0.5s ease;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.03) 0%, transparent 20%),
+                              radial-gradient(circle at 90% 80%, rgba(255,255,255,0.03) 0%, transparent 20%);
+        }
+
+        /* 布局容器 */
+        .container {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+            height: 85vh;
+            min-height: 700px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+            transition: background-color 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        /* 左侧信息面板 */
+        .info-panel {
+            background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%);
+            color: #FFF;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+        
+        .info-panel::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            animation: moveBg 60s linear infinite;
+        }
+        @keyframes moveBg { from { background-position: 0 0; } to { background-position: 60px 60px; } }
+
+        .info-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 1; }
+        .clock-box { font-variant-numeric: tabular-nums; }
+        .time-display { font-size: 2.5rem; font-weight: 300; letter-spacing: 1px; }
+        .date-display { font-size: 1rem; opacity: 0.9; margin-top: 5px; }
+        
+        /* 主题选择器 */
+        .theme-selector {
+            display: flex;
+            gap: 6px;
+            background: rgba(0,0,0,0.2);
+            padding: 5px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .theme-dot {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.5);
+            transition: transform 0.2s;
+        }
+        .theme-dot:hover { transform: scale(1.2); border-color: #fff; }
+        .theme-dot.active { transform: scale(1.2); border-color: #fff; box-shadow: 0 0 5px rgba(255,255,255,0.5); }
+
+        .selected-day-info { z-index: 1; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin: 20px 0; }
+        .day-big { font-size: 8rem; font-weight: bold; line-height: 1; font-family: var(--font-serif); text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .lunar-detail { margin-top: 10px; font-size: 1.2rem; font-family: var(--font-serif); }
+        .ganzhi-info { margin-top: 8px; font-size: 0.9rem; opacity: 0.8; }
+        
+        .yiji-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: transform 0.3s;
+        }
+        .yiji-box:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.15); }
+
+        .yiji-row { display: flex; margin-bottom: 12px; }
+        .yiji-row:last-child { margin-bottom: 0; }
+        .yiji-label { 
+            width: 32px; height: 32px; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .yi-label { background: #FFF; color: var(--primary-color); }
+        .ji-label { background: rgba(0,0,0,0.3); color: #FFF; }
+        .yiji-content { font-size: 0.95rem; line-height: 1.6; display: flex; flex-wrap: wrap; gap: 5px; }
+
+        /* 右侧日历主体 */
+        .calendar-main {
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .month-controls { display: flex; align-items: center; gap: 15px; }
+        .control-btn {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .control-btn:hover { background: var(--bg-color); border-color: var(--primary-color); color: var(--primary-color); }
+        .current-month-display { font-size: 1.5rem; font-weight: bold; font-family: var(--font-serif); cursor: pointer; padding: 5px 10px; border-radius: 8px; transition: var(--transition); }
+        .current-month-display:hover { background: var(--bg-color); color: var(--primary-color); }
+
+        .header-actions { display: flex; gap: 10px; }
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .action-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        .action-btn.active { background: var(--primary-color); color: #FFF; border-color: var(--primary-color); }
+
+        /* 日历网格 */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: 40px auto;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        .weekday-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .weekend-text { color: var(--weekend-color); }
+
+        .days-container {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-auto-rows: 1fr;
+            gap: 12px;
+        }
+
+        .day-cell {
+            position: relative;
+            border-radius: 16px;
+            border: 1px solid transparent;
+            background: var(--bg-color);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 8px;
+            min-height: 80px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .day-cell:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-color);
+            z-index: 2;
+        }
+
+        .day-cell.other-month { opacity: 0.4; filter: grayscale(1); }
+        .day-cell.today { background: var(--today-bg); border: 1px solid var(--primary-color); font-weight: bold; }
+        .day-cell.selected { background: var(--primary-color); color: #FFF !important; box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+        .day-cell.selected .lunar-text { color: rgba(255,255,255,0.8); }
+        .day-cell.selected .festival-tag { background: rgba(255,255,255,0.2); color: #FFF; }
+        .day-cell.selected .has-task-dot { background: #FFF; }
+
+        .solar-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+        .lunar-text { font-size: 0.75rem; color: var(--text-secondary); }
+        .day-cell.selected .lunar-text { color: rgba(255,255,255,0.9); }
+
+        .festival-tag {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--primary-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90%;
+            font-weight: 500;
+        }
+        .festival-tag.holiday { background: rgba(255,255,255,0.5); }
+        .day-cell.selected .festival-tag.holiday { background: rgba(255,255,255,0.25); color: #fff; }
+        
+        .term-tag { color: var(--secondary-color); font-weight: bold; }
+        .day-cell.selected .term-tag { color: #fff; opacity: 0.9; }
+
+        .work-rest-badge {
+            position: absolute;
+            top: 0; right: 0;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-bottom-left-radius: 8px;
+            font-weight: bold;
+            box-shadow: -1px 1px 3px rgba(0,0,0,0.1);
+        }
+        .badge-rest { background: #4CAF50; color: white; }
+        .badge-work { background: #FF5722; color: white; }
+
+        /* 响应式 */
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; height: auto; min-height: auto; display: flex; flex-direction: column; }
+            .info-panel { padding: 20px; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 20px; }
+            .selected-day-info { flex-direction: row; gap: 20px; margin: 0; text-align: left; }
+            .day-big { font-size: 4rem; }
+            .yiji-box { display: none; } /* 移动端简化 */
+            .calendar-main { padding: 20px; }
+            .day-cell { min-height: 60px; }
+            .theme-selector { position: absolute; top: 20px; right: 20px; }
+        }
+        
+        /* 动画类 */
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+
+        /* 日程样式 */
+        .schedule-box {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 15px;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+        .schedule-header {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .schedule-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding-right: 5px;
+        }
+        .schedule-list::-webkit-scrollbar { width: 4px; }
+        .schedule-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+
+        .task-item {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .task-item:hover { background: rgba(0,0,0,0.3); }
+        .task-time { font-weight: bold; margin-right: 10px; font-family: var(--font-serif); color: var(--secondary-color); }
+        .task-content { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .task-del { cursor: pointer; opacity: 0.6; padding: 2px; }
+        .task-del:hover { opacity: 1; color: #ff4d4f; }
+
+        .add-task-form { display: flex; gap: 8px; }
+        .task-input {
+            flex-grow: 1;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        .task-input::placeholder { color: rgba(255,255,255,0.5); }
+        .task-time-input {
+            width: 75px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 6px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        .task-time-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        .btn-add {
+            background: var(--secondary-color);
+            border: none;
+            border-radius: 6px;
+            width: 30px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-add:hover { background: #e5c14d; }
+
+        /* 提醒弹窗 */
+        .reminder-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            color: var(--text-main);
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 5px solid var(--primary-color);
+            max-width: 320px;
+        }
+        .reminder-toast.show { transform: translateX(0); }
+        .reminder-content { flex-grow: 1; }
+        .reminder-title { font-weight: bold; font-size: 1rem; margin-bottom: 4px; }
+        .reminder-desc { font-size: 0.9rem; color: var(--text-secondary); }
+        .btn-close-toast { background: transparent; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text-secondary); }
+
+        /* Day cell indicator */
+        .has-task-dot {
+            position: absolute;
+            bottom: 6px;
+            width: 5px;
+            height: 5px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+        }
+        .day-cell.selected .has-task-dot { background-color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 左侧信息栏 -->
+    <aside class="info-panel">
+        <div class="info-header">
+            <div class="clock-box">
+                <div class="time-display" id="clockTime">00:00:00</div>
+                <div class="date-display" id="clockDate">YYYY-MM-DD</div>
+            </div>
+            
+            <!-- 主题选择器 -->
+            <div class="theme-selector" id="themeSelector">
+                <div class="theme-dot" style="background: #C93756;" data-theme="red" title="丹砂红"></div>
+                <div class="theme-dot" style="background: #FF7F50;" data-theme="orange" title="雄黄橙"></div>
+                <div class="theme-dot" style="background: #FBC531;" data-theme="yellow" title="槐花黄"></div>
+                <div class="theme-dot" style="background: #27AE60;" data-theme="green" title="翡翠绿"></div>
+                <div class="theme-dot" style="background: #00B894;" data-theme="cyan" title="天青色"></div>
+                <div class="theme-dot" style="background: #0984E3;" data-theme="blue" title="景泰蓝"></div>
+                <div class="theme-dot" style="background: #8E44AD;" data-theme="purple" title="紫檀色"></div>
+                <div class="theme-dot" style="background: #636E72;" data-theme="gray" title="水墨灰"></div>
+            </div>
+        </div>
+
+        <div class="selected-day-info" id="selectedInfo">
+            <div class="day-big" id="selDay">--</div>
+            <div>
+                <div class="lunar-detail" id="selLunar">正月初一</div>
+                <div class="ganzhi-info" id="selGanzhi">甲子年 丙寅月 戊午日</div>
+                <div class="ganzhi-info" id="selZodiac">属鼠 [星期一]</div>
+            </div>
+        </div>
+
+        <div class="yiji-box">
+            <div class="yiji-row">
+                <div class="yiji-label yi-label">宜</div>
+                <div class="yiji-content" id="yiContent"></div>
+            </div>
+            <div class="yiji-row">
+                <div class="yiji-label ji-label">忌</div>
+                <div class="yiji-content" id="jiContent"></div>
+            </div>
+        </div>
+
+        <div class="schedule-box">
+            <div class="schedule-header">
+                <span>📅 日程 & 记事</span>
+                <span style="font-size: 0.8rem; opacity: 0.7" id="scheduleDateStr">--</span>
+            </div>
+            <div class="schedule-list" id="scheduleList">
+                <!-- Dynamic Tasks -->
+            </div>
+            <div class="add-task-form">
+                <input type="time" class="task-time-input" id="taskTime" required>
+                <input type="text" class="task-input" id="taskInput" placeholder="添加新事项..." autocomplete="off">
+                <button class="btn-add" id="btnAddTask">+</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 右侧日历主体 -->
+    <main class="calendar-main">
+        <header class="calendar-header">
+            <div class="month-controls">
+                <button class="control-btn" id="prevYear">«</button>
+                <button class="control-btn" id="prevMonth">‹</button>
+                <div class="current-month-display" id="monthDisplay">2023年 12月</div>
+                <button class="control-btn" id="nextMonth">›</button>
+                <button class="control-btn" id="nextYear">»</button>
+            </div>
+            <div class="header-actions">
+                <button class="action-btn" id="btnToday">回到今天</button>
+            </div>
+        </header>
+
+        <div class="calendar-grid">
+            <!-- 星期头 -->
+            <div class="weekday-header weekend-text">日</div>
+            <div class="weekday-header">一</div>
+            <div class="weekday-header">二</div>
+            <div class="weekday-header">三</div>
+            <div class="weekday-header">四</div>
+            <div class="weekday-header">五</div>
+            <div class="weekday-header weekend-text">六</div>
+
+            <!-- 日期容器 -->
+            <div class="days-container" id="daysContainer">
+                <!-- JS动态生成 -->
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<!-- 提醒弹窗 -->
+<div class="reminder-toast" id="reminderToast">
+    <div style="font-size: 1.5rem;">⏰</div>
+    <div class="reminder-content">
+        <div class="reminder-title">日程提醒</div>
+        <div class="reminder-desc" id="reminderDesc">内容...</div>
+    </div>
+    <button class="btn-close-toast" id="btnCloseToast">×</button>
+</div>
+
+<script>
+/**
+ * 核心逻辑模块
+ * 包含：农历算法、节气计算、宜忌生成、UI渲染
+ */
+
+const CalendarCore = (function() {
+    // --- 基础数据 ---
+    // 农历数据 1900-2100 (压缩格式)
+    // 格式：每行代表一年。20位二进制数。
+    // 0-3位：闰月月份 (0无闰月)
+    // 4-16位：1-13月的月大(1)/月小(0)。(若无闰月第13位无效)
+    // 17-20位：该年闰月天数 0=29天, 1=30天 (历史数据可能有特殊编码，这里使用标准简化版)
+    // 实际使用查表法。为节省篇幅，这里使用精简后的 Hex 数组 (1900-2100)
+    const LUNAR_INFO = [
+        0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+        0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+        0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+        0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+        0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+        0x06ca0,0x0b550,0x15355,0x04da0,0x0a5d0,0x14573,0x052d0,0x0a9a8,0x0e950,0x06aa0,
+        0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+        0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b5a0,0x195a6,
+        0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+        0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,
+        0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,
+        0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,
+        0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,
+        0x05aa0,0x076a3,0x096d0,0x04bd7,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,
+        0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0
+    ];
+
+    // 节气常量 (简化版，基于1900年偏移)
+    const SOLAR_TERM_INFO = [
+        0, 21208, 42467, 63836, 85337, 107014, 128867, 150921, 173149, 195551, 218072, 240693,
+        263343, 285989, 308563, 331033, 353350, 375494, 397447, 419210, 440795, 462224, 483532, 504758
+    ];
+    const SOLAR_TERM_NAMES = [
+        "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至",
+        "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"
+    ];
+
+    const GAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+    const ZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+    const ANIMALS = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
+    const CHINESE_NUM = ["日", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+    const CHINESE_MONTH = ["正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"];
+    
+    // 宜忌词库 (用于生成算法)
+    const YI_JI_DATA = {
+        yi: ["出行", "交易", "开业", "祈福", "祭祀", "嫁娶", "移徙", "动土", "安床", "纳畜", "安葬", "修造", "入宅", "裁衣"],
+        ji: ["词讼", "探病", "开仓", "掘井", "置产", "行丧", "破土", "伐木", "安门", "作灶", "斋醮", "针灸"]
+    };
+
+    // 节日库
+    const FESTIVALS = {
+        solar: {
+            "0101": "元旦", "0214": "情人节", "0308": "妇女节", "0312": "植树节", "0401": "愚人节",
+            "0501": "劳动节", "0504": "青年节", "0601": "儿童节", "0701": "建党节", "0801": "建军节",
+            "0910": "教师节", "1001": "国庆节", "1224": "平安夜", "1225": "圣诞节"
+        },
+        lunar: {
+            "0101": "春节", "0115": "元宵节", "0202": "龙抬头", "0505": "端午节", "0707": "七夕节",
+            "0715": "中元节", "0815": "中秋节", "0909": "重阳节", "1208": "腊八节", "1223": "小年"
+        }
+    };
+
+    // --- 辅助计算函数 ---
+
+    // 1. 农历核心计算
+    function getLunarYearDays(y) {
+        let i, sum = 348;
+        for (i = 0x8000; i > 0x8; i >>= 1) sum += (LUNAR_INFO[y - 1900] & i) ? 1 : 0;
+        return sum + getLeapMonthDays(y);
+    }
+
+    function getLeapMonth(y) { return LUNAR_INFO[y - 1900] & 0xf; }
+
+    function getLeapMonthDays(y) {
+        if (getLeapMonth(y)) return (LUNAR_INFO[y - 1900] & 0x10000) ? 30 : 29;
+        return 0;
+    }
+
+    function getLunarMonthDays(y, m) {
+        return (LUNAR_INFO[y - 1900] & (0x10000 >> m)) ? 30 : 29;
+    }
+
+    // 2. 节气计算 (近似算法，修正为北京时间)
+    function getTermDay(y, n) {
+        const offDate = new Date((31556925974.7 * (y - 1900) + SOLAR_TERM_INFO[n] * 60000) + Date.UTC(1900, 0, 6, 2, 5));
+        // 转换为北京时间 (UTC+8)
+        const beijingDate = new Date(offDate.getTime() + 8 * 3600000);
+        return beijingDate.getUTCDate();
+    }
+
+    // 3. 干支计算
+    function getGanZhiYear(lunarYear) {
+        let ganIndex = (lunarYear - 4) % 10;
+        let zhiIndex = (lunarYear - 4) % 12;
+        return GAN[ganIndex] + ZHI[zhiIndex];
+    }
+
+    function getGanZhiMonth(lunarYear, solarMonthIndex) {
+        // solarMonthIndex: 0=Small Cold, 1=Big Cold, 2=Li Chun (Start of Year)...
+        // Note: GanZhi Month usually changes at "Jie" (Terms 2, 4, 6...).
+        // But simplified logic often aligns with lunar or solar month.
+        // Let's use the strict definition: Month changes at Jie.
+        // Jie indices in SOLAR_TERM_NAMES: 2(LiChun), 4(JingZhe), ... 22(XiaoHan), 0(XiaoHan next year?)
+        
+        // We need the "Jie" index relative to the year.
+        // Terms: 0=XiaoHan(Jan), 1=DaHan(Jan), 2=LiChun(Feb)...
+        
+        // Month Stem is based on Year Stem.
+        // Year Stem Index: (lunarYear - 4) % 10.
+        // Formula: (YearGan * 2 + 1) is the stem of the first month (Li Chun).
+        
+        // We need to determine which "Solar Month" we are in.
+        // It's easier to calculate inside solarToLunar where we have the term info.
+        return ""; // Handled in main function
+    }
+
+    // 4. 宜忌生成算法 (确定性伪随机)
+    function getYiJi(year, month, day) {
+        const hash = (year * 366 + month * 31 + day) % 1000; // 确保同一天数据一致
+        const yiCount = (hash % 4) + 2; // 2-5个
+        const jiCount = ((hash >> 2) % 4) + 2;
+        
+        const getItems = (arr, count, seed) => {
+            let res = [];
+            let tempArr = [...arr];
+            for(let i=0; i<count; i++) {
+                if (tempArr.length === 0) break;
+                let idx = (seed + i * 7) % tempArr.length;
+                res.push(tempArr[idx]);
+                tempArr.splice(idx, 1);
+            }
+            return res;
+        };
+
+        return {
+            yi: getItems(YI_JI_DATA.yi, yiCount, hash),
+            ji: getItems(YI_JI_DATA.ji, jiCount, hash + 123)
+        };
+    }
+
+    // --- 主转换函数 ---
+    function solarToLunar(date) {
+        let y = date.getFullYear(), m = date.getMonth(), d = date.getDate();
+        let baseDate = new Date(1900, 0, 31);
+        let offset = Math.floor((date - baseDate) / 86400000);
+
+        // 干支日计算
+        // 1900-01-31 is 1900-01-30(utc)? No, let's use a reference.
+        // 1900-01-31 (Lunar Jan 1) is a known day.
+        // Reference: 1899-12-22 was JiaZi (0).
+        // Let's use 1900-01-01 as base. 1900-01-01 is Monday.
+        // 1900-01-01 is Jia Xu (10).
+        // So offset from 1900-01-01:
+        let base1900 = new Date(1900, 0, 1);
+        let dayOffset = Math.floor((date - base1900) / 86400000);
+        let gzDayIdx = (dayOffset + 10) % 60; 
+        if(gzDayIdx < 0) gzDayIdx += 60;
+        let ganZhiDay = GAN[gzDayIdx % 10] + ZHI[gzDayIdx % 12];
+
+        // 农历计算
+        let i, leap = 0, temp = 0;
+        let lunarOffset = offset;
+        
+        for (i = 1900; i < 2101 && lunarOffset > 0; i++) {
+            temp = getLunarYearDays(i);
+            lunarOffset -= temp;
+        }
+
+        if (lunarOffset < 0) { lunarOffset += temp; i--; }
+
+        let lunarYear = i;
+        let leapMonth = getLeapMonth(i);
+        let isLeap = false;
+
+        for (i = 1; i < 13 && lunarOffset > 0; i++) {
+            if (leapMonth > 0 && i == (leapMonth + 1) && !isLeap) {
+                --i; isLeap = true; temp = getLeapMonthDays(lunarYear);
+            } else {
+                temp = getLunarMonthDays(lunarYear, i);
+            }
+            if (isLeap && i == (leapMonth + 1)) isLeap = false;
+            lunarOffset -= temp;
+        }
+
+        if (lunarOffset == 0 && leapMonth > 0 && i == leapMonth + 1) {
+            if (isLeap) { isLeap = false; } else { isLeap = true; --i; }
+        }
+        if (lunarOffset < 0) { lunarOffset += temp; --i; }
+
+        let lunarMonth = i;
+        let lunarDay = lunarOffset + 1;
+
+        // 节气与干支月
+        let term = null;
+        const term2 = getTermDay(y, m * 2);
+        const term2_next = getTermDay(y, m * 2 + 1);
+        
+        if (d === term2) term = SOLAR_TERM_NAMES[m * 2];
+        else if (d === term2_next) term = SOLAR_TERM_NAMES[m * 2 + 1];
+
+        // 干支月计算 (严格依据节气)
+        // 立春(term index 2) starts the year's first month (Yin)
+        // Find the cumulative term index for the current date
+        // Simple approach: Check if date is before or after the "Jie" (Major Term) of the month.
+        // "Jie" terms are at even indices in SOLAR_TERM_NAMES: 0(XiaoHan), 2(LiChun), 4(JingZhe)...
+        // m is 0(Jan), 1(Feb)...
+        // Jan: XiaoHan(0), DaHan(1). If before XiaoHan, it's prev month (Zi). If >= XiaoHan < LiChun, it's Chou.
+        
+        let firstTermDay = getTermDay(y, m * 2);
+        let solarMonthIdx = m * 2; // Default to the first term of the month
+        if (d >= firstTermDay) {
+            solarMonthIdx = m * 2;
+        } else {
+            solarMonthIdx = m * 2 - 1;
+        }
+        
+        // Calculate standard GanZhi Month index (0=Yin, 1=Mao...)
+        // Li Chun (Index 2) is start of Month 0 (Yin).
+        // Solar Index: ... 0(XiaoHan), 1(DaHan), 2(LiChun), 3(YuShui)...
+        
+        // Adjust for Year Boundary (Li Chun)
+        let gzYear = y;
+        let termLiChun = getTermDay(y, 2);
+        if (m < 1 || (m === 1 && d < termLiChun)) {
+            gzYear = y - 1;
+        }
+        
+        let ganZhiYear = GAN[(gzYear - 4) % 10] + ZHI[(gzYear - 4) % 12];
+        let zodiac = ANIMALS[(gzYear - 4) % 12];
+        
+        // Formula works for all if we handle negative modulo correctly.
+        let monthOffset = Math.floor((solarMonthIdx - 2) / 2);
+        // if (solarMonthIdx < 2) monthOffset = 11; // Removed buggy override
+        
+        let yearGanIdx = (gzYear - 4) % 10;
+        let monthGanBase = (yearGanIdx % 5) * 2 + 2;
+        let monthGan = (monthGanBase + monthOffset) % 10;
+        if (monthGan < 0) monthGan += 10; // Handle negative result
+        
+        let monthZhi = (2 + monthOffset) % 12; // Yin is 2.
+        if (monthZhi < 0) monthZhi += 12;
+        
+        let ganZhiMonth = GAN[monthGan] + ZHI[monthZhi];
+
+        // 节日
+        let festival = [];
+        // 公历节日
+        let sKey = (m + 1).toString().padStart(2, '0') + d.toString().padStart(2, '0');
+        if (FESTIVALS.solar[sKey]) festival.push(FESTIVALS.solar[sKey]);
+        // 农历节日
+        let lKey = lunarMonth.toString().padStart(2, '0') + Math.floor(lunarDay).toString().padStart(2, '0');
+        if (FESTIVALS.lunar[lKey] && !isLeap) festival.push(FESTIVALS.lunar[lKey]);
+        // 除夕特殊判断
+        if (lunarMonth === 12 && lunarDay === getLunarMonthDays(lunarYear, 12) && !isLeap) festival.push("除夕");
+        // 清明特殊判断
+        if (term === "清明") festival.push("清明节");
+
+        return {
+            lYear: lunarYear,
+            lMonth: lunarMonth,
+            lDay: lunarDay,
+            isLeap: isLeap,
+            term: term,
+            festival: festival,
+            ganZhiYear: ganZhiYear,
+            ganZhiMonth: ganZhiMonth,
+            ganZhiDay: ganZhiDay,
+            zodiac: zodiac,
+            lMonthStr: (isLeap ? "闰" : "") + CHINESE_MONTH[lunarMonth - 1] + "月",
+            lDayStr: (lunarDay <= 10 ? "初" : (lunarDay <= 20 ? "十" : "廿")) + CHINESE_NUM[lunarDay % 10],
+            yiji: getYiJi(y, m + 1, d)
+        };
+    }
+
+    return {
+        solarToLunar,
+        CHINESE_NUM,
+        CHINESE_MONTH
+    };
+})();
+
+/**
+ * 日程管理模块
+ */
+const ScheduleManager = (function() {
+    const STORAGE_PREFIX = 'cal_schedule_';
+    
+    function getKey(date) {
+        const y = date.getFullYear();
+        const m = (date.getMonth() + 1).toString().padStart(2, '0');
+        const d = date.getDate().toString().padStart(2, '0');
+        return `${STORAGE_PREFIX}${y}_${m}_${d}`;
+    }
+
+    function getTasks(date) {
+        const key = getKey(date);
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : [];
+    }
+
+    function addTask(date, time, content) {
+        const key = getKey(date);
+        const tasks = getTasks(date);
+        tasks.push({
+            id: Date.now().toString(),
+            time: time,
+            content: content,
+            alerted: false
+        });
+        // Sort by time
+        tasks.sort((a, b) => a.time.localeCompare(b.time));
+        localStorage.setItem(key, JSON.stringify(tasks));
+        return tasks;
+    }
+
+    function removeTask(date, id) {
+        const key = getKey(date);
+        let tasks = getTasks(date);
+        tasks = tasks.filter(t => t.id !== id);
+        localStorage.setItem(key, JSON.stringify(tasks));
+        return tasks;
+    }
+
+    function markAlerted(date, id) {
+        const key = getKey(date);
+        const tasks = getTasks(date);
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+            task.alerted = true;
+            localStorage.setItem(key, JSON.stringify(tasks));
+        }
+    }
+    
+    function hasTask(date) {
+        const tasks = getTasks(date);
+        return tasks.length > 0;
+    }
+
+    return { getTasks, addTask, removeTask, markAlerted, hasTask };
+})();
+
+/**
+ * 页面逻辑控制
+ */
+const App = (function() {
+    let currentDate = new Date();
+    let selectedDate = new Date();
+    const daysContainer = document.getElementById('daysContainer');
+    const monthDisplay = document.getElementById('monthDisplay');
+    const tooltip = document.getElementById('tooltip');
+
+    // DOM Elements for Detail View
+    const els = {
+        clockTime: document.getElementById('clockTime'),
+        clockDate: document.getElementById('clockDate'),
+        selDay: document.getElementById('selDay'),
+        selLunar: document.getElementById('selLunar'),
+        selGanzhi: document.getElementById('selGanzhi'),
+        selZodiac: document.getElementById('selZodiac'),
+        yiContent: document.getElementById('yiContent'),
+        jiContent: document.getElementById('jiContent'),
+        // Schedule Elements
+        scheduleList: document.getElementById('scheduleList'),
+        scheduleDateStr: document.getElementById('scheduleDateStr'),
+        taskTime: document.getElementById('taskTime'),
+        taskInput: document.getElementById('taskInput'),
+        btnAddTask: document.getElementById('btnAddTask'),
+        // Toast
+        reminderToast: document.getElementById('reminderToast'),
+        reminderDesc: document.getElementById('reminderDesc'),
+        btnCloseToast: document.getElementById('btnCloseToast')
+    };
+
+    // 初始化
+    function init() {
+        renderCalendar(currentDate);
+        startClock();
+        updateDetailPanel(selectedDate);
+        bindEvents();
+        loadSettings();
+        
+        // Check for reminders every 30s
+        setInterval(checkReminders, 30000);
+        // Request notification permission
+        if ("Notification" in window) Notification.requestPermission();
+    }
+
+    // 渲染日历网格
+    function renderCalendar(date) {
+        daysContainer.innerHTML = '';
+        const year = date.getFullYear();
+        const month = date.getMonth(); // 0-11
+
+        monthDisplay.textContent = `${year}年 ${month + 1}月`;
+
+        const firstDayOfMonth = new Date(year, month, 1);
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startDayOfWeek = firstDayOfMonth.getDay(); // 0(Sun) - 6(Sat)
+
+        const prevMonthDays = new Date(year, month, 0).getDate();
+
+        // 填充上个月的剩余日期
+        for (let i = startDayOfWeek - 1; i >= 0; i--) {
+            const d = new Date(year, month - 1, prevMonthDays - i);
+            createDayCell(d, true);
+        }
+
+        // 填充当月日期
+        for (let i = 1; i <= daysInMonth; i++) {
+            const d = new Date(year, month, i);
+            createDayCell(d, false);
+        }
+
+        // 填充下个月的开头日期 (凑满42格或35格)
+        const totalCells = startDayOfWeek + daysInMonth;
+        const nextDays = totalCells > 35 ? 42 - totalCells : 35 - totalCells;
+        for (let i = 1; i <= nextDays; i++) {
+            const d = new Date(year, month + 1, i);
+            createDayCell(d, true);
+        }
+    }
+
+    function createDayCell(date, isOtherMonth) {
+        const cell = document.createElement('div');
+        cell.className = `day-cell ${isOtherMonth ? 'other-month' : ''}`;
+        
+        // 判断今天
+        const today = new Date();
+        if (date.toDateString() === today.toDateString()) {
+            cell.classList.add('today');
+        }
+        // 判断选中
+        if (date.toDateString() === selectedDate.toDateString()) {
+            cell.classList.add('selected');
+        }
+
+        // 农历数据
+        const lunar = CalendarCore.solarToLunar(date);
+        
+        // 标记节假日/周末
+        const dayOfWeek = date.getDay();
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+        let festivalHtml = '';
+        if (lunar.festival.length > 0) {
+            festivalHtml = `<div class="festival-tag holiday">${lunar.festival[0]}</div>`;
+        } else if (lunar.term) {
+            festivalHtml = `<div class="festival-tag term-tag">${lunar.term}</div>`;
+        }
+
+        // 补班/休假 (示例逻辑，实际需要复杂配置)
+        // 这里简单处理：法定节日当天显示"休"
+        let badgeHtml = '';
+        if (lunar.festival.length > 0 && ['春节','国庆节','五一'].includes(lunar.festival[0])) {
+             badgeHtml = `<div class="work-rest-badge badge-rest">休</div>`;
+        }
+        
+        // 检查是否有日程
+        let hasTaskHtml = '';
+        if (ScheduleManager.hasTask(date)) {
+            hasTaskHtml = `<div class="has-task-dot"></div>`;
+        }
+
+        cell.innerHTML = `
+            ${badgeHtml}
+            <div class="solar-text ${isWeekend ? 'weekend-text' : ''}">${date.getDate()}</div>
+            <div class="lunar-text">${lunar.lDay === 1 ? lunar.lMonthStr : lunar.lDayStr}</div>
+            ${festivalHtml}
+            ${hasTaskHtml}
+        `;
+
+        cell.onclick = () => {
+            selectedDate = date;
+            renderCalendar(currentDate); // 重新渲染以更新选中状态
+            updateDetailPanel(date);
+        };
+
+        // Tooltip logic for festivals
+        if (lunar.festival.length > 0 || lunar.term) {
+            cell.onmouseenter = (e) => showTooltip(e, lunar.festival.join(' ') || lunar.term);
+            cell.onmouseleave = hideTooltip;
+        }
+
+        daysContainer.appendChild(cell);
+    }
+
+    function updateDetailPanel(date) {
+        const lunar = CalendarCore.solarToLunar(date);
+        const weekArr = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+
+        // 动画过渡
+        els.selDay.parentElement.classList.remove('fade-in');
+        void els.selDay.parentElement.offsetWidth; // trigger reflow
+        els.selDay.parentElement.classList.add('fade-in');
+
+        els.selDay.textContent = date.getDate();
+        els.selLunar.textContent = `${lunar.lMonthStr}${lunar.lDayStr}`;
+        if(lunar.festival.length > 0) els.selLunar.textContent += ` · ${lunar.festival[0]}`;
+        else if(lunar.term) els.selLunar.textContent += ` · ${lunar.term}`;
+
+        // 更新为准确的干支显示 (年 月 日)
+        els.selGanzhi.textContent = `${lunar.ganZhiYear}年 ${lunar.ganZhiMonth}月 ${lunar.ganZhiDay}日`;
+        els.selZodiac.textContent = `[${lunar.zodiac}年] ${weekArr[date.getDay()]}`;
+
+        // 更新宜忌
+        renderYiJi(lunar.yiji);
+        
+        // 更新日程列表
+        renderSchedule(date);
+    }
+
+    function renderYiJi(yiji) {
+        els.yiContent.innerHTML = yiji.yi.map(t => `<span>${t}</span>`).join(' ');
+        els.jiContent.innerHTML = yiji.ji.map(t => `<span>${t}</span>`).join(' ');
+    }
+    
+    function renderSchedule(date) {
+        els.scheduleDateStr.textContent = `${date.getMonth()+1}月${date.getDate()}日`;
+        const tasks = ScheduleManager.getTasks(date);
+        
+        if (tasks.length === 0) {
+            els.scheduleList.innerHTML = '<div style="text-align:center; color:rgba(255,255,255,0.4); padding-top:20px; font-size:0.9rem;">暂无日程</div>';
+        } else {
+            els.scheduleList.innerHTML = tasks.map(t => `
+                <div class="task-item">
+                    <div class="task-time">${t.time}</div>
+                    <div class="task-content" title="${t.content}">${t.content}</div>
+                    <div class="task-del" onclick="App.deleteTask('${t.id}')">×</div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    function handleAddTask() {
+        const time = els.taskTime.value;
+        const content = els.taskInput.value.trim();
+        if (!time || !content) {
+            alert('请输入时间和内容');
+            return;
+        }
+        ScheduleManager.addTask(selectedDate, time, content);
+        renderSchedule(selectedDate);
+        renderCalendar(currentDate); // Update dots
+        els.taskInput.value = '';
+    }
+    
+    function deleteTask(id) {
+        if(confirm('确定删除该日程吗？')) {
+            ScheduleManager.removeTask(selectedDate, id);
+            renderSchedule(selectedDate);
+            renderCalendar(currentDate); // Update dots
+        }
+    }
+    
+    function checkReminders() {
+        const now = new Date();
+        const tasks = ScheduleManager.getTasks(now);
+        const currentHm = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        
+        tasks.forEach(t => {
+            if (!t.alerted && t.time === currentHm) {
+                showReminder(t.content);
+                ScheduleManager.markAlerted(now, t.id);
+            }
+        });
+    }
+    
+    function showReminder(text) {
+        // Browser notification
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("日程提醒", { body: text });
+        }
+        
+        // In-app toast
+        els.reminderDesc.textContent = text;
+        els.reminderToast.classList.add('show');
+        // Auto hide after 5s
+        setTimeout(() => {
+            els.reminderToast.classList.remove('show');
+        }, 8000);
+    }
+
+    function startClock() {
+        setInterval(() => {
+            const now = new Date();
+            els.clockTime.textContent = now.toLocaleTimeString('en-GB');
+            els.clockDate.textContent = now.toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
+        }, 1000);
+    }
+
+    function showTooltip(e, text) {
+        tooltip.style.display = 'block';
+        tooltip.textContent = text;
+        tooltip.style.left = e.pageX + 10 + 'px';
+        tooltip.style.top = e.pageY + 10 + 'px';
+    }
+
+    function hideTooltip() {
+        tooltip.style.display = 'none';
+    }
+
+    function bindEvents() {
+        document.getElementById('prevMonth').onclick = () => changeMonth(-1);
+        document.getElementById('nextMonth').onclick = () => changeMonth(1);
+        document.getElementById('prevYear').onclick = () => changeYear(-1);
+        document.getElementById('nextYear').onclick = () => changeYear(1);
+        document.getElementById('btnToday').onclick = () => {
+            currentDate = new Date();
+            selectedDate = new Date();
+            renderCalendar(currentDate);
+            updateDetailPanel(selectedDate);
+        };
+        
+        // 主题切换 - 已移至 loadSettings 和下方独立绑定
+        // document.getElementById('themeToggle').onclick = toggleTheme;
+        
+        // Schedule Events
+        els.btnAddTask.onclick = handleAddTask;
+        els.taskInput.onkeypress = (e) => { if(e.key === 'Enter') handleAddTask(); };
+        els.btnCloseToast.onclick = () => { els.reminderToast.classList.remove('show'); };
+
+        // 键盘导航
+        document.addEventListener('keydown', (e) => {
+            if(e.key.startsWith('Arrow')) {
+                let d = new Date(selectedDate);
+                if(e.key === 'ArrowRight') d.setDate(d.getDate() + 1);
+                if(e.key === 'ArrowLeft') d.setDate(d.getDate() - 1);
+                if(e.key === 'ArrowUp') d.setDate(d.getDate() - 7);
+                if(e.key === 'ArrowDown') d.setDate(d.getDate() + 7);
+                
+                selectedDate = d;
+                // 如果跨月，自动切换视图
+                if(d.getMonth() !== currentDate.getMonth()) {
+                    currentDate = new Date(d);
+                }
+                renderCalendar(currentDate);
+                updateDetailPanel(selectedDate);
+            }
+        });
+    }
+
+    function changeMonth(delta) {
+        currentDate.setMonth(currentDate.getMonth() + delta);
+        renderCalendar(currentDate);
+    }
+
+    function changeYear(delta) {
+        currentDate.setFullYear(currentDate.getFullYear() + delta);
+        renderCalendar(currentDate);
+    }
+
+    function toggleTheme(themeName) {
+        document.body.setAttribute('data-theme', themeName);
+        localStorage.setItem('theme', themeName);
+        
+        // Update dots UI
+        document.querySelectorAll('.theme-dot').forEach(dot => {
+            if(dot.getAttribute('data-theme') === themeName) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+    }
+
+    function loadSettings() {
+        const theme = localStorage.getItem('theme') || 'red';
+        toggleTheme(theme);
+    }
+    
+    // Bind theme dots
+    document.querySelectorAll('.theme-dot').forEach(dot => {
+        dot.onclick = () => toggleTheme(dot.getAttribute('data-theme'));
+    });
+
+    return { init, deleteTask }; // Export deleteTask for onclick
+})();
+
+// 启动应用
+window.onload = App.init;
+
+</script>
+</body>
+</html>
