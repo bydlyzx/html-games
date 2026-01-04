@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泡泡龙游戏 - 梦幻版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: #0a0a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 深空星河背景 */
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at 20% 80%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 0, 150, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 200, 255, 0.1) 0%, transparent 60%),
+                linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(2px 2px at 160px 120px, rgba(255,200,255,0.9), transparent),
+                radial-gradient(1px 1px at 230px 80px, #fff, transparent),
+                radial-gradient(2px 2px at 300px 150px, rgba(200,220,255,0.8), transparent);
+            background-size: 350px 200px;
+            animation: twinkle 4s ease-in-out infinite;
+        }
+
+        .stars:nth-child(2) {
+            background-position: 50px 50px;
+            animation-delay: -2s;
+            opacity: 0.5;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 流光效果 */
+        .aurora {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 0, 128, 0.03),
+                rgba(0, 255, 255, 0.05),
+                rgba(255, 0, 255, 0.03),
+                transparent);
+            animation: aurora 15s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes aurora {
+            from { transform: translateX(-50%); }
+            to { transform: translateX(0%); }
+        }
+
+        /* 浮动光球 */
+        .floating-orbs {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,0,128,0.3), transparent);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0,200,255,0.2), transparent);
+            top: 60%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .orb:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(150,0,255,0.25), transparent);
+            bottom: 20%;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(20px, 10px) scale(1.05); }
+        }
+
+        #gameContainer {
+            position: relative;
+            z-index: 10;
+            padding: 35px;
+            background: linear-gradient(135deg,
+                rgba(255,255,255,0.1) 0%,
+                rgba(255,255,255,0.05) 50%,
+                rgba(255,255,255,0.1) 100%);
+            border-radius: 40px;
+            backdrop-filter: blur(20px);
+            box-shadow:
+                0 0 60px rgba(255,0,128,0.3),
+                0 0 100px rgba(0,200,255,0.2),
+                inset 0 0 60px rgba(255,255,255,0.05),
+                0 25px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: containerGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes containerGlow {
+            0% { box-shadow: 0 0 60px rgba(255,0,128,0.3), 0 0 100px rgba(0,200,255,0.2), inset 0 0 60px rgba(255,255,255,0.05), 0 25px 50px rgba(0,0,0,0.5); }
+            100% { box-shadow: 0 0 80px rgba(0,200,255,0.4), 0 0 120px rgba(255,0,128,0.3), inset 0 0 80px rgba(255,255,255,0.08), 0 25px 50px rgba(0,0,0,0.5); }
+        }
+
+        /* 装饰性角标 */
+        #gameContainer::before,
+        #gameContainer::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 3px solid transparent;
+            border-image: linear-gradient(135deg, #ff0080, #00d4ff) 1;
+        }
+
+        #gameContainer::before {
+            top: -3px;
+            left: -3px;
+            border-right: none;
+            border-bottom: none;
+            border-top-left-radius: 30px;
+        }
+
+        #gameContainer::after {
+            bottom: -3px;
+            right: -3px;
+            border-left: none;
+            border-top: none;
+            border-bottom-right-radius: 30px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .canvas-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff0080, #00d4ff, #ff0080, #00d4ff);
+            background-size: 400% 400%;
+            border-radius: 22px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #gameCanvas {
+            display: block;
+            border-radius: 20px;
+            cursor: crosshair;
+            position: relative;
+            z-index: 1;
+        }
+
+        #ui {
+            text-align: center;
+            margin-top: 25px;
+            position: relative;
+        }
+
+        .score-container {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, rgba(255,0,128,0.2), rgba(0,200,255,0.2));
+            border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        #score {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, #ff80bf 50%, #80dfff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        #powerBar {
+            width: 280px;
+            height: 12px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            margin: 20px auto;
+            overflow: hidden;
+            box-shadow:
+                inset 0 2px 10px rgba(0,0,0,0.5),
+                0 0 20px rgba(255,0,128,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+        }
+
+        #powerBar::before {
+            content: 'POWER';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 3px;
+            z-index: 2;
+        }
+
+        #powerFill {
+            height: 100%;
+            background: linear-gradient(90deg,
+                #ff0080 0%,
+                #ff8c00 25%,
+                #ffff00 50%,
+                #00ff88 75%,
+                #00d4ff 100%);
+            width: 0%;
+            transition: width 0.05s ease;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+            position: relative;
+        }
+
+        #powerFill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button {
+            position: relative;
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border-radius: 30px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #ff0080, #7928ca, #00d4ff);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+            z-index: -2;
+            border-radius: 30px;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: rgba(10,10,26,0.8);
+            border-radius: 28px;
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 40px rgba(255,0,128,0.4), 0 0 60px rgba(0,200,255,0.3);
+        }
+
+        button:hover::after {
+            background: rgba(255,0,128,0.2);
+        }
+
+        button:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        #soundBtn {
+            padding: 15px 20px;
+            font-size: 18px;
+        }
+
+        .instructions {
+            color: rgba(255,255,255,0.7);
+            margin-top: 20px;
+            font-size: 11px;
+            line-height: 1.8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .instructions span {
+            color: #ff80bf;
+            font-weight: 700;
+        }
+
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, rgba(10,10,26,0.98), rgba(30,10,50,0.98));
+            color: white;
+            padding: 50px 60px;
+            border-radius: 30px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+            border: 2px solid rgba(255,0,128,0.5);
+            box-shadow:
+                0 0 100px rgba(255,0,128,0.5),
+                0 0 200px rgba(0,200,255,0.3),
+                inset 0 0 100px rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+        }
+
+        #gameOver.show {
+            display: block;
+            animation: gameOverAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes gameOverAppear {
+            from { transform: translate(-50%, -50%) scale(0) rotate(-10deg); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        #gameOver h2 {
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff0080, #ff8c00, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        #gameOver p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        #finalScore {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff, #ff0080);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            margin-top: 10px;
+            animation: scorePulse 1s ease-in-out infinite;
+        }
+
+        @keyframes scorePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* 下一个泡泡预览 */
+        .next-bubble-label {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 游戏标题 */
+        .game-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title h1 {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff0080 0%, #ff8c00 25%, #ffff00 50%, #00ff88 75%, #00d4ff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGradient 3s linear infinite;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            filter: drop-shadow(0 0 30px rgba(255,0,128,0.5));
+        }
+
+        @keyframes titleGradient {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .game-title .subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 8px;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        /* 连击特效提示 */
+        .combo-text {
+            position: absolute;
+            font-size: 24px;
+            font-weight: 900;
+            pointer-events: none;
+            animation: comboFloat 1s ease-out forwards;
+            z-index: 50;
+        }
+
+        @keyframes comboFloat {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1.5); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景效果 -->
+    <div class="starfield">
+        <div class="stars"></div>
+        <div class="stars"></div>
+    </div>
+    <div class="aurora"></div>
+    <div class="floating-orbs">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <div id="gameContainer">
+        <div class="game-title">
+            <h1>Bubble Dragon</h1>
+            <div class="subtitle">Dream Edition</div>
+        </div>
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="700" height="900"></canvas>
+        </div>
+        <div id="ui">
+            <div class="score-container">
+                <div id="score">SCORE: 0</div>
+            </div>
+            <div id="powerBar">
+                <div id="powerFill"></div>
+            </div>
+            <div class="controls">
+                <button id="restartBtn">RESTART</button>
+                <button id="soundBtn">♪</button>
+            </div>
+            <div class="instructions">
+                <span>CLICK</span> to shoot | Match <span>3+</span> same colors | Don't let bubbles reach bottom!
+            </div>
+        </div>
+    </div>
+
+    <div id="gameOver">
+        <h2>Game Over</h2>
+        <p>Final Score</p>
+        <span id="finalScore">0</span>
+        <br><br>
+        <button onclick="restartGame()">Play Again</button>
+    </div>
+
+    <script>
+        // Audio Context for sound effects
+        let audioContext;
+        let soundEnabled = true;
+
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSound(frequency, duration, type = 'sine', volume = 0.3) {
+            if (!soundEnabled) return;
+            if (!audioContext) initAudio();
+
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        // 华丽的消除音效
+        function playComboSound(comboCount) {
+            if (!soundEnabled) return;
+            const baseFreq = 600;
+            for (let i = 0; i < Math.min(comboCount, 5); i++) {
+                setTimeout(() => {
+                    playSound(baseFreq + i * 100, 0.2, 'sine', 0.2);
+                }, i * 50);
+            }
+        }
+
+        // Game variables
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+        const powerFill = document.getElementById('powerFill');
+
+        // Game configuration
+        const BUBBLE_RADIUS = 28;
+        const BUBBLE_SPACING = BUBBLE_RADIUS * 2;
+        const ROW_HEIGHT = BUBBLE_RADIUS * Math.sqrt(3);
+
+        // 9关系统配置 - 每关不同的难度和颜色主题
+        const LEVEL_CONFIGS = [
+            // Level 1: 简单 - 粉红蓝色主题
+            {
+                name: 'LEVEL 1: NOVICE',
+                rows: 5,
+                colorCount: 3,
+                colors: [
+                    { main: '#ff0080', light: '#ff80bf', dark: '#99004d', glow: 'rgba(255,0,128,0.6)' },
+                    { main: '#00d4ff', light: '#80eaff', dark: '#007a99', glow: 'rgba(0,212,255,0.6)' },
+                    { main: '#ffcc00', light: '#ffe066', dark: '#997a00', glow: 'rgba(255,204,0,0.6)' }
+                ],
+                targetScore: 500,
+                bgGradient: ['#0a0a1a', '#1a0a2e', '#0a1a2e', '#0a0a1a']
+            },
+            // Level 2: 简单升级 - 绿色紫色主题
+            {
+                name: 'LEVEL 2: EASY',
+                rows: 6,
+                colorCount: 4,
+                colors: [
+                    { main: '#00ff88', light: '#80ffbf', dark: '#00994d', glow: 'rgba(0,255,136,0.6)' },
+                    { main: '#9933ff', light: '#cc99ff', dark: '#5c1f99', glow: 'rgba(153,51,255,0.6)' },
+                    { main: '#ff0080', light: '#ff80bf', dark: '#99004d', glow: 'rgba(255,0,128,0.6)' },
+                    { main: '#00d4ff', light: '#80eaff', dark: '#007a99', glow: 'rgba(0,212,255,0.6)' }
+                ],
+                targetScore: 1000,
+                bgGradient: ['#0a0a1a', '#2a0a1a', '#1a0a2a', '#0a0a1a']
+            },
+            // Level 3: 中等 - 金色橙色主题
+            {
+                name: 'LEVEL 3: MEDIUM',
+                rows: 7,
+                colorCount: 4,
+                colors: [
+                    { main: '#ffcc00', light: '#ffe066', dark: '#997a00', glow: 'rgba(255,204,0,0.6)' },
+                    { main: '#ff6600', light: '#ffb380', dark: '#993d00', glow: 'rgba(255,102,0,0.6)' },
+                    { main: '#ff0080', light: '#ff80bf', dark: '#99004d', glow: 'rgba(255,0,128,0.6)' },
+                    { main: '#9933ff', light: '#cc99ff', dark: '#5c1f99', glow: 'rgba(153,51,255,0.6)' }
+                ],
+                targetScore: 1500,
+                bgGradient: ['#1a0a0a', '#2a1a0a', '#1a0a1a', '#0a0a0a']
+            },
+            // Level 4: 中等偏难 - 蓝绿主题
+            {
+                name: 'LEVEL 4: CHALLENGE',
+                rows: 7,
+                colorCount: 5,
+                colors: [
+                    { main: '#00d4ff', light: '#80eaff', dark: '#007a99', glow: 'rgba(0,212,255,0.6)' },
+                    { main: '#00ff88', light: '#80ffbf', dark: '#00994d', glow: 'rgba(0,255,136,0.6)' },
+                    { main: '#ff0080', light: '#ff80bf', dark: '#99004d', glow: 'rgba(255,0,128,0.6)' },
+                    { main: '#ffcc00', light: '#ffe066', dark: '#997a00', glow: 'rgba(255,204,0,0.6)' },
+                    { main: '#9933ff', light: '#cc99ff', dark: '#5c1f99', glow: 'rgba(153,51,255,0.6)' }
+                ],
+                targetScore: 2000,
+                bgGradient: ['#0a0a1a', '#0a1a2a', '#1a0a2a', '#0a0a1a']
+            },
+            // Level 5: 难 - 彩虹主题
+            {
+                name: 'LEVEL 5: HARD',
+                rows: 8,
+                colorCount: 5,
+                colors: [
+                    { main: '#ff0080', light: '#ff80bf', dark: '#99004d', glow: 'rgba(255,0,128,0.6)' },
+                    { main: '#ff6600', light: '#ffb380', dark: '#993d00', glow: 'rgba(255,102,0,0.6)' },
+                    { main: '#ffcc00', light: '#ffe066', dark: '#997a00', glow: 'rgba(255,204,0,0.6)' },
+                    { main: '#00ff88', light: '#80ffbf', dark: '#00994d', glow: 'rgba(0,255,136,0.6)' },
+                    { main: '#00d4ff', light: '#80eaff', dark: '#007a99', glow: 'rgba(0,212,255,0.6)' }
+                ],
+                targetScore: 2500,
+                bgGradient: ['#1a0a0a', '#1a0a1a', '#0a1a1a', '#1a0a0a']
+            },
+            // Level 6: 困难 - 紫色系主题
+            {
+                name: 'LEVEL 6: NIGHTMARE',
+                rows: 8,
+                colorCount: 6,
+                colors: [
+                    { main: '#9933ff', light: '#cc99ff', dark: '#5c1f99', glow: 'rgba(153,51,255,0.6)' },
+                    { main: '#ff0080', light: '#ff80bf', dark: '#99004d', glow: 'rgba(255,0,128,0.6)' },
+                    { main: '#00d4ff', light: '#80eaff', dark: '#007a99', glow: 'rgba(0,212,255,0.6)' },
+                    { main: '#ff6600', light: '#ffb380', dark: '#993d00', glow: 'rgba(255,102,0,0.6)' },
+                    { main: '#00ff88', light: '#80ffbf', dark: '#00994d', glow: 'rgba(0,255,136,0.6)' },
+                    { main: '#ffcc00', light: '#ffe066', dark: '#997a00', glow: 'rgba(255,204,0,0.6)' }
+                ],
+                targetScore: 3000,
+                bgGradient: ['#0a0a1a', '#1a0a2a', '#2a0a1a', '#0a0a1a']
+            },
+            // Level 7: 极难 - 冰蓝主题
+            {
+                name: 'LEVEL 7: INSANE',
+                rows: 9,
+                colorCount: 6,
+                colors: [
+                    { main: '#00d4ff', light: '#80eaff', dark: '#007a99', glow: 'rgba(0,212,255,0.6)' },
+                    { main: '#00ccff', light: '#99e6ff', dark: '#006680', glow: 'rgba(0,204,255,0.6)' },
+                    { main: '#ff0080', light: '#ff80bf', dark: '#99004d', glow: 'rgba(255,0,128,0.6)' },
+                    { main: '#9933ff', light: '#cc99ff', dark: '#5c1f99', glow: 'rgba(153,51,255,0.6)' },
+                    { main: '#00ff88', light: '#80ffbf', dark: '#00994d', glow: 'rgba(0,255,136,0.6)' },
+                    { main: '#ffcc00', light: '#ffe066', dark: '#997a00', glow: 'rgba(255,204,0,0.6)' }
+                ],
+                targetScore: 3500,
+                bgGradient: ['#0a1a2a', '#0a2a3a', '#1a2a3a', '#0a1a2a']
+            },
+            // Level 8: 恐怖 - 红色系主题
+            {
+                name: 'LEVEL 8: HELLISH',
+                rows: 9,
+                colorCount: 6,
+                colors: [
+                    { main: '#ff0080', light: '#ff80bf', dark: '#99004d', glow: 'rgba(255,0,128,0.6)' },
+                    { main: '#ff6600', light: '#ffb380', dark: '#993d00', glow: 'rgba(255,102,0,0.6)' },
+                    { main: '#ff3333', light: '#ff8080', dark: '#990000', glow: 'rgba(255,51,51,0.6)' },
+                    { main: '#9933ff', light: '#cc99ff', dark: '#5c1f99', glow: 'rgba(153,51,255,0.6)' },
+                    { main: '#ffcc00', light: '#ffe066', dark: '#997a00', glow: 'rgba(255,204,0,0.6)' },
+                    { main: '#00ff88', light: '#80ffbf', dark: '#00994d', glow: 'rgba(0,255,136,0.6)' }
+                ],
+                targetScore: 4000,
+                bgGradient: ['#1a0a0a', '#2a0a0a', '#0a0a0a', '#1a0a0a']
+            },
+            // Level 9: 地狱 - 彩虹爆炸主题
+            {
+                name: 'LEVEL 9: ABYSS',
+                rows: 10,
+                colorCount: 6,
+                colors: [
+                    { main: '#ff00ff', light: '#ff80ff', dark: '#990099', glow: 'rgba(255,0,255,0.6)' },
+                    { main: '#ff0080', light: '#ff80bf', dark: '#99004d', glow: 'rgba(255,0,128,0.6)' },
+                    { main: '#ff6600', light: '#ffb380', dark: '#993d00', glow: 'rgba(255,102,0,0.6)' },
+                    { main: '#00d4ff', light: '#80eaff', dark: '#007a99', glow: 'rgba(0,212,255,0.6)' },
+                    { main: '#00ff88', light: '#80ffbf', dark: '#00994d', glow: 'rgba(0,255,136,0.6)' },
+                    { main: '#ffcc00', light: '#ffe066', dark: '#997a00', glow: 'rgba(255,204,0,0.6)' }
+                ],
+                targetScore: 5000,
+                bgGradient: ['#0a0a1a', '#1a0a2a', '#2a0a1a', '#0a2a2a']
+            }
+        ];
+
+        // 当前关卡颜色配置
+        let currentLevelColors = LEVEL_CONFIGS[0].colors;
+
+        // 性能优化常量
+        const MAX_PARTICLES = 200;
+        const MAX_SPARKLES = 100;
+        const DISTANCE_SQ_THRESHOLD = BUBBLE_RADIUS * BUBBLE_RADIUS * 4.84; // 2.2² 用于碰撞检测
+
+        // 瞄准线缓存
+        let lastMouseX = -1;
+        let lastMouseY = -1;
+        let cachedAimPath = [];
+        let aimPathFrameCount = 0;
+
+        // DOM更新节流
+        let powerBarUpdateCounter = 0;
+
+        // 泡泡渐变缓存
+        const bubbleGradientCache = new Map();
+
+        // Game state
+        let bubbles = [];
+        let projectiles = [];
+        let particles = [];
+        let sparkles = [];
+        let score = 0;
+        let gameOver = false;
+        let currentBubble = null;
+        let nextBubble = null;
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height - 100;
+        let power = 0;
+        let powerDirection = 1;
+        let time = 0;
+        let comboCount = 0;
+        let currentLevel = 0;
+        let levelScore = 0;
+
+        // Initialize game
+        function init() {
+            bubbles = [];
+            projectiles = [];
+            particles = [];
+            sparkles = [];
+            score = 0;
+            gameOver = false;
+            currentBubble = null;
+            comboCount = 0;
+            currentLevel = 0;
+            levelScore = 0;
+
+            loadLevel(0);
+        }
+
+        // Load a specific level
+        function loadLevel(levelIndex) {
+            if (levelIndex >= LEVEL_CONFIGS.length) {
+                // Beat all levels - game complete
+                endGame(true);
+                return;
+            }
+
+            currentLevel = levelIndex;
+            const levelConfig = LEVEL_CONFIGS[levelIndex];
+            currentLevelColors = levelConfig.colors;
+            levelScore = 0;
+            bubbles = [];
+            projectiles = [];
+            particles = [];
+            sparkles = [];
+
+            // 预创建该关卡所有颜色的渐变（性能优化）
+            bubbleGradientCache.clear();
+            currentLevelColors.forEach((color, colorIndex) => {
+                // 为每个颜色创建缓存条目，包含常用scale的渐变
+                const cacheEntry = { color: color, gradients: {} };
+
+                // 预创建scale=1的渐变（常用于游戏区泡泡）
+                const r1 = BUBBLE_RADIUS * 1;
+                const grad1 = ctx.createRadialGradient(-r1 * 0.3, -r1 * 0.3, 0, 0, 0, r1);
+                grad1.addColorStop(0, color.light);
+                grad1.addColorStop(0.5, color.main);
+                grad1.addColorStop(1, color.dark);
+                cacheEntry.gradients[1] = grad1;
+
+                const edgeGrad1 = ctx.createRadialGradient(0, 0, r1 * 0.8, 0, 0, r1);
+                edgeGrad1.addColorStop(0, 'transparent');
+                edgeGrad1.addColorStop(1, 'rgba(255,255,255,0.2)');
+                cacheEntry.edgeGradients = cacheEntry.edgeGradients || {};
+                cacheEntry.edgeGradients[1] = edgeGrad1;
+
+                // 预创建scale=0.6的渐变（用于下一个泡泡预览）
+                const r06 = BUBBLE_RADIUS * 0.6;
+                const grad06 = ctx.createRadialGradient(-r06 * 0.3, -r06 * 0.3, 0, 0, 0, r06);
+                grad06.addColorStop(0, color.light);
+                grad06.addColorStop(0.5, color.main);
+                grad06.addColorStop(1, color.dark);
+                cacheEntry.gradients[0.6] = grad06;
+
+                const edgeGrad06 = ctx.createRadialGradient(0, 0, r06 * 0.8, 0, 0, r06);
+                edgeGrad06.addColorStop(0, 'transparent');
+                edgeGrad06.addColorStop(1, 'rgba(255,255,255,0.2)');
+                cacheEntry.edgeGradients[0.6] = edgeGrad06;
+
+                bubbleGradientCache.set(colorIndex, cacheEntry);
+            });
+
+            // Create initial bubble grid based on level config
+            for (let row = 0; row < levelConfig.rows; row++) {
+                for (let col = 0; col < Math.floor(canvas.width / BUBBLE_SPACING); col++) {
+                    const x = col * BUBBLE_SPACING + (row % 2) * BUBBLE_RADIUS + BUBBLE_RADIUS;
+                    const y = row * ROW_HEIGHT + BUBBLE_RADIUS + 30;
+                    if (x < canvas.width - BUBBLE_RADIUS) {
+                        bubbles.push({
+                            x: x,
+                            y: y,
+                            colorIndex: Math.floor(Math.random() * levelConfig.colorCount),
+                            row: row,
+                            col: col,
+                            scale: 1,
+                            wobble: Math.random() * Math.PI * 2
+                        });
+                    }
+                }
+            }
+
+            nextBubble = createRandomBubble(levelConfig.colorCount);
+            currentBubble = createRandomBubble(levelConfig.colorCount);
+
+            // 预先计算初始瞄准线（默认向上）
+            const initialAngle = -Math.PI / 2; // 直向上
+            cachedAimPath = calculateAimLinePath(currentBubble.x, currentBubble.y, initialAngle);
+
+            updateScoreDisplay();
+            gameOverElement.classList.remove('show');
+            gameOverElement.style.display = 'none';
+        }
+
+        function createRandomBubble(colorCount) {
+            const colorIdx = Math.floor(Math.random() * colorCount);
+            return {
+                x: canvas.width / 2,
+                y: canvas.height - 50,
+                colorIndex: colorIdx,
+                vx: 0,
+                vy: 0,
+                scale: 1,
+                trail: []
+            };
+        }
+
+        function updateScoreDisplay() {
+            const levelConfig = LEVEL_CONFIGS[currentLevel];
+            scoreElement.textContent = `LEVEL ${currentLevel + 1} | SCORE: ${score} | TARGET: ${levelConfig.targetScore}`;
+        }
+
+        // Mouse event handlers
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('click', () => {
+            if (!gameOver && currentBubble && !currentBubble.vx && !currentBubble.vy) {
+                shootBubble();
+            }
+        });
+
+        function shootBubble() {
+            const angle = Math.atan2(mouseY - currentBubble.y, mouseX - currentBubble.x);
+            // 限制发射角度
+            const limitedAngle = Math.max(-Math.PI + 0.2, Math.min(-0.2, angle));
+            const speed = 12;
+
+            currentBubble.vx = Math.cos(limitedAngle) * speed;
+            currentBubble.vy = Math.sin(limitedAngle) * speed;
+
+            projectiles.push(currentBubble);
+            currentBubble = nextBubble;
+            currentBubble.x = canvas.width / 2;
+            currentBubble.y = canvas.height - 50;
+            nextBubble = createRandomBubble(LEVEL_CONFIGS[currentLevel].colorCount);
+
+            playSound(800, 0.15, 'sine', 0.2);
+
+            // 发射特效
+            const availableSparkles = MAX_SPARKLES - sparkles.length;
+            const sparklesToAdd = Math.min(8, availableSparkles);
+            for (let i = 0; i < sparklesToAdd; i++) {
+                const a = (Math.PI * 2 * i) / 8;
+                sparkles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height - 50,
+                    vx: Math.cos(a) * 3,
+                    vy: Math.sin(a) * 3,
+                    life: 1,
+                    color: currentLevelColors[currentBubble.colorIndex].main
+                });
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            time += 0.016;
+            update();
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        function update() {
+            if (gameOver) return;
+
+            // Update power bar (节流：每3帧更新一次DOM)
+            power += powerDirection * 0.8;
+            if (power >= 100) powerDirection = -1;
+            if (power <= 0) powerDirection = 1;
+
+            powerBarUpdateCounter++;
+            if (powerBarUpdateCounter >= 3) {
+                powerFill.style.width = power + '%';
+                powerBarUpdateCounter = 0;
+            }
+
+            // Update bubble wobble
+            bubbles.forEach(b => {
+                b.wobble += 0.05;
+            });
+
+            // Update projectiles
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                const proj = projectiles[i];
+
+                // 保存轨迹
+                proj.trail.push({ x: proj.x, y: proj.y });
+                if (proj.trail.length > 10) proj.trail.shift();
+
+                proj.x += proj.vx;
+                proj.y += proj.vy;
+
+                // Bounce off walls
+                if (proj.x <= BUBBLE_RADIUS || proj.x >= canvas.width - BUBBLE_RADIUS) {
+                    proj.vx *= -1;
+                    proj.x = Math.max(BUBBLE_RADIUS, Math.min(canvas.width - BUBBLE_RADIUS, proj.x));
+                    playSound(400, 0.05, 'square', 0.1);
+
+                    // 墙壁碰撞特效
+                    const availableSparkles = MAX_SPARKLES - sparkles.length;
+                    const sparklesToAdd = Math.min(5, availableSparkles);
+                    for (let j = 0; j < sparklesToAdd; j++) {
+                        sparkles.push({
+                            x: proj.x,
+                            y: proj.y,
+                            vx: (Math.random() - 0.5) * 4,
+                            vy: (Math.random() - 0.5) * 4,
+                            life: 1,
+                            color: '#fff'
+                        });
+                    }
+                }
+
+                // Hit top wall
+                if (proj.y <= BUBBLE_RADIUS + 30) {
+                    snapToGrid(proj);
+                    projectiles.splice(i, 1);
+                    continue;
+                }
+
+                // Check collision with existing bubbles
+                for (let j = 0; j < bubbles.length; j++) {
+                    const bubble = bubbles[j];
+                    const dx = proj.x - bubble.x;
+                    const dy = proj.y - bubble.y;
+                    const distSq = dx * dx + dy * dy;
+
+                    if (distSq <= BUBBLE_RADIUS * BUBBLE_RADIUS * 4) {
+                        snapToGrid(proj);
+                        projectiles.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+
+            // Update sparkles
+            for (let i = sparkles.length - 1; i >= 0; i--) {
+                const s = sparkles[i];
+                s.x += s.vx;
+                s.y += s.vy;
+                s.vy += 0.1;
+                s.life -= 0.03;
+                if (s.life <= 0) sparkles.splice(i, 1);
+            }
+
+            // Update particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.15;
+                p.life -= p.decay;
+                p.rotation += p.rotationSpeed;
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            // Check game over
+            for (let bubble of bubbles) {
+                if (bubble.y >= canvas.height - 100) {
+                    endGame();
+                    break;
+                }
+            }
+        }
+
+        function snapToGrid(proj) {
+            let closestRow = Math.round((proj.y - 30 - BUBBLE_RADIUS) / ROW_HEIGHT);
+            closestRow = Math.max(0, closestRow);
+            let closestCol = Math.round((proj.x - (closestRow % 2) * BUBBLE_RADIUS - BUBBLE_RADIUS) / BUBBLE_SPACING);
+
+            let x = closestCol * BUBBLE_SPACING + (closestRow % 2) * BUBBLE_RADIUS + BUBBLE_RADIUS;
+            let y = closestRow * ROW_HEIGHT + BUBBLE_RADIUS + 30;
+
+            bubbles.push({
+                x: Math.max(BUBBLE_RADIUS, Math.min(canvas.width - BUBBLE_RADIUS, x)),
+                y: Math.max(BUBBLE_RADIUS + 30, Math.min(canvas.height - 100, y)),
+                colorIndex: proj.colorIndex,
+                row: closestRow,
+                col: closestCol,
+                scale: 1.3,
+                wobble: 0
+            });
+
+            // 缩放动画
+            setTimeout(() => {
+                const newBubble = bubbles[bubbles.length - 1];
+                if (newBubble) newBubble.scale = 1;
+            }, 100);
+
+            playSound(600, 0.15, 'triangle', 0.2);
+            createImpactEffect(x, y, proj.colorIndex);
+
+            // Check matches after snap
+            setTimeout(() => checkMatches(), 50);
+        }
+
+        function createImpactEffect(x, y, colorIndex) {
+            const color = currentLevelColors[colorIndex];
+            const availableSparkles = MAX_SPARKLES - sparkles.length;
+            const sparklesToAdd = Math.min(12, availableSparkles);
+            for (let i = 0; i < sparklesToAdd; i++) {
+                const angle = (Math.PI * 2 * i) / 12;
+                sparkles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * 4,
+                    vy: Math.sin(angle) * 4,
+                    life: 1,
+                    color: color.light
+                });
+            }
+        }
+
+        function checkMatches() {
+            const visited = new Set();
+            const toRemove = new Set();
+
+            for (let bubble of bubbles) {
+                if (visited.has(bubble)) continue;
+
+                const cluster = [];
+                const stack = [bubble];
+
+                while (stack.length > 0) {
+                    const current = stack.pop();
+                    if (visited.has(current)) continue;
+                    visited.add(current);
+                    cluster.push(current);
+
+                    for (let other of bubbles) {
+                        if (!visited.has(other) && other.colorIndex === current.colorIndex) {
+                            const dx = current.x - other.x;
+                            const dy = current.y - other.y;
+                            const distSq = dx * dx + dy * dy;
+
+                            if (distSq <= DISTANCE_SQ_THRESHOLD) {
+                                stack.push(other);
+                            }
+                        }
+                    }
+                }
+
+                if (cluster.length >= 3) {
+                    cluster.forEach(b => toRemove.add(b));
+                }
+            }
+
+            if (toRemove.size > 0) {
+                comboCount++;
+                const comboBonus = Math.floor(comboCount * 1.5);
+                const points = toRemove.size * (10 + comboBonus);
+                score += points;
+                levelScore += points;
+                updateScoreDisplay();
+
+                // 显示连击文字
+                if (comboCount > 1) {
+                    showComboText(comboCount);
+                }
+
+                toRemove.forEach(bubble => {
+                    createExplosionParticles(bubble.x, bubble.y, bubble.colorIndex);
+                });
+
+                bubbles = bubbles.filter(b => !toRemove.has(b));
+                playComboSound(toRemove.size);
+
+                // 检查悬空泡泡
+                setTimeout(() => removeFloatingBubbles(), 100);
+
+                // 检查是否完成关卡
+                setTimeout(() => checkLevelComplete(), 100);
+            } else {
+                comboCount = 0;
+            }
+        }
+
+        function checkLevelComplete() {
+            if (bubbles.length === 0 || levelScore >= LEVEL_CONFIGS[currentLevel].targetScore) {
+                // 关卡完成！加载下一关
+                currentLevel++;
+                if (currentLevel >= LEVEL_CONFIGS.length) {
+                    endGame(true);
+                } else {
+                    setTimeout(() => loadLevel(currentLevel), 1000);
+                }
+            }
+        }
+
+        function showComboText(combo) {
+            const container = document.getElementById('gameContainer');
+            const text = document.createElement('div');
+            text.className = 'combo-text';
+            text.style.left = '50%';
+            text.style.top = '50%';
+            text.style.transform = 'translate(-50%, -50%)';
+            text.style.background = 'linear-gradient(135deg, #ff0080, #ffcc00)';
+            text.style.webkitBackgroundClip = 'text';
+            text.style.webkitTextFillColor = 'transparent';
+            text.textContent = `${combo}x COMBO!`;
+            container.appendChild(text);
+            setTimeout(() => text.remove(), 1000);
+        }
+
+        function createExplosionParticles(x, y, colorIndex) {
+            const color = currentLevelColors[colorIndex];
+            const availableSlots = MAX_PARTICLES - particles.length;
+            if (availableSlots <= 0) return;
+
+            const particlesToAdd = Math.min(20, availableSlots);
+            for (let i = 0; i < particlesToAdd; i++) {
+                const angle = (Math.PI * 2 * i) / 20 + Math.random() * 0.3;
+                const speed = 3 + Math.random() * 5;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 2,
+                    color: i % 2 === 0 ? color.main : color.light,
+                    life: 1.0,
+                    decay: 0.015 + Math.random() * 0.015,
+                    size: 4 + Math.random() * 6,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.3
+                });
+            }
+
+            // 星星闪光
+            const availableSparkles = MAX_SPARKLES - sparkles.length;
+            const sparklesToAdd = Math.min(8, availableSparkles);
+            for (let i = 0; i < sparklesToAdd; i++) {
+                const angle = (Math.PI * 2 * i) / 8;
+                sparkles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * 6,
+                    vy: Math.sin(angle) * 6,
+                    life: 1,
+                    color: '#fff'
+                });
+            }
+        }
+
+        function removeFloatingBubbles() {
+            const visited = new Set();
+            const stack = [];
+
+            for (let bubble of bubbles) {
+                if (bubble.y <= BUBBLE_RADIUS + ROW_HEIGHT + 30) {
+                    stack.push(bubble);
+                }
+            }
+
+            while (stack.length > 0) {
+                const current = stack.pop();
+                if (visited.has(current)) continue;
+                visited.add(current);
+
+                for (let bubble of bubbles) {
+                    if (!visited.has(bubble)) {
+                        const dx = current.x - bubble.x;
+                        const dy = current.y - bubble.y;
+                        const distSq = dx * dx + dy * dy;
+
+                        if (distSq <= DISTANCE_SQ_THRESHOLD) {
+                            stack.push(bubble);
+                        }
+                    }
+                }
+            }
+
+            const toRemove = bubbles.filter(b => !visited.has(b));
+            if (toRemove.length > 0) {
+                const points = toRemove.length * 20;
+                score += points;
+                levelScore += points;
+                updateScoreDisplay();
+
+                toRemove.forEach(bubble => {
+                    // 掉落动画粒子
+                    createFallingParticles(bubble.x, bubble.y, bubble.colorIndex);
+                });
+
+                bubbles = bubbles.filter(b => visited.has(b));
+                playSound(900, 0.3, 'sine', 0.25);
+            }
+        }
+
+        function createFallingParticles(x, y, colorIndex) {
+            const color = currentLevelColors[colorIndex];
+            const availableSlots = MAX_PARTICLES - particles.length;
+            if (availableSlots <= 0) return;
+
+            const particlesToAdd = Math.min(15, availableSlots);
+            for (let i = 0; i < particlesToAdd; i++) {
+                particles.push({
+                    x: x + (Math.random() - 0.5) * 20,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: Math.random() * 2,
+                    color: color.main,
+                    life: 1.0,
+                    decay: 0.01 + Math.random() * 0.01,
+                    size: 5 + Math.random() * 8,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.2
+                });
+            }
+        }
+
+        // 计算瞄准线轨迹：从发射点到底部，允许多次反弹
+        function calculateAimLinePath(startX, startY, angle) {
+            const pathPoints = [];
+            pathPoints.push({ x: startX, y: startY });
+
+            let x = startX;
+            let y = startY;
+            let vx = Math.cos(angle) * 12;
+            let vy = Math.sin(angle) * 12;
+
+            const MAX_ITERATIONS = 1000;
+            const stopY = canvas.height - 100;
+
+            for (let i = 0; i < MAX_ITERATIONS; i++) {
+                x += vx;
+                y += vy;
+
+                // 左右墙壁反射
+                if (x <= BUBBLE_RADIUS) {
+                    vx *= -1;
+                    x = BUBBLE_RADIUS;
+                } else if (x >= canvas.width - BUBBLE_RADIUS) {
+                    vx *= -1;
+                    x = canvas.width - BUBBLE_RADIUS;
+                }
+
+                // 顶部反射
+                if (y <= BUBBLE_RADIUS + 30) {
+                    vy *= -1;
+                    y = BUBBLE_RADIUS + 30;
+                }
+
+                pathPoints.push({ x: x, y: y });
+
+                // 底部停止（只有在向下移动时才停止）
+                if (y >= stopY && vy > 0) {
+                    return pathPoints;
+                }
+            }
+
+            return pathPoints;
+        }
+
+        function draw() {
+            // 清除画布并绘制渐变背景（基于当前关卡）
+            const levelConfig = LEVEL_CONFIGS[currentLevel];
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, levelConfig.bgGradient[0]);
+            bgGradient.addColorStop(0.3, levelConfig.bgGradient[1]);
+            bgGradient.addColorStop(0.7, levelConfig.bgGradient[2]);
+            bgGradient.addColorStop(1, levelConfig.bgGradient[3]);
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制网格背景线
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+            // 顶部装饰条
+            const topGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            topGradient.addColorStop(0, 'rgba(255,0,128,0.3)');
+            topGradient.addColorStop(0.5, 'rgba(0,212,255,0.3)');
+            topGradient.addColorStop(1, 'rgba(255,0,128,0.3)');
+            ctx.fillStyle = topGradient;
+            ctx.fillRect(0, 0, canvas.width, 30);
+
+            // 绘制泡泡
+            for (let bubble of bubbles) {
+                drawBubble(bubble.x, bubble.y, bubble.colorIndex, bubble.scale, bubble.wobble);
+            }
+
+            // 绘制射出的泡泡和轨迹
+            for (let proj of projectiles) {
+                // 绘制轨迹
+                if (proj.trail.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(proj.trail[0].x, proj.trail[0].y);
+                    for (let i = 1; i < proj.trail.length; i++) {
+                        ctx.lineTo(proj.trail[i].x, proj.trail[i].y);
+                    }
+                    ctx.strokeStyle = currentLevelColors[proj.colorIndex].glow;
+                    ctx.lineWidth = 8;
+                    ctx.lineCap = 'round';
+                    ctx.stroke();
+                }
+                drawBubble(proj.x, proj.y, proj.colorIndex, 1, 0, true);
+            }
+
+            // 绘制粒子
+            for (let p of particles) {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation);
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = p.color;
+                // 绘制菱形粒子
+                ctx.beginPath();
+                ctx.moveTo(0, -p.size / 2);
+                ctx.lineTo(p.size / 2, 0);
+                ctx.lineTo(0, p.size / 2);
+                ctx.lineTo(-p.size / 2, 0);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // 绘制闪光
+            for (let s of sparkles) {
+                ctx.globalAlpha = s.life;
+                ctx.fillStyle = s.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = s.color;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 3 * s.life, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            ctx.globalAlpha = 1;
+
+            // 发射区域（先绘制背景）
+            const launcherGradient = ctx.createLinearGradient(0, canvas.height - 80, 0, canvas.height);
+            launcherGradient.addColorStop(0, 'rgba(0,0,0,0)');
+            launcherGradient.addColorStop(1, 'rgba(0,0,0,0.5)');
+            ctx.fillStyle = launcherGradient;
+            ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+
+            // 绘制当前泡泡和瞄准线
+            if (currentBubble && !currentBubble.vx && !currentBubble.vy) {
+                // 检查鼠标是否移动，若移动则重新计算瞄准线
+                if (mouseX !== lastMouseX || mouseY !== lastMouseY) {
+                    const angle = Math.atan2(mouseY - currentBubble.y, mouseX - currentBubble.x);
+                    const limitedAngle = Math.max(-Math.PI + 0.2, Math.min(-0.2, angle));
+                    cachedAimPath = calculateAimLinePath(currentBubble.x, currentBubble.y, limitedAngle);
+                    lastMouseX = mouseX;
+                    lastMouseY = mouseY;
+                }
+
+                // 绘制瞄准线
+                if (cachedAimPath && cachedAimPath.length > 1) {
+                    // 绘制虚线轨迹
+                    ctx.setLineDash([8, 8]);
+                    ctx.strokeStyle = 'rgba(100, 200, 255, 0.6)';
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(cachedAimPath[0].x, cachedAimPath[0].y);
+
+                    for (let i = 1; i < cachedAimPath.length; i++) {
+                        ctx.lineTo(cachedAimPath[i].x, cachedAimPath[i].y);
+                    }
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // 在终点显示标记（圆形光点）
+                    const endPoint = cachedAimPath[cachedAimPath.length - 1];
+
+                    // 外层光圈
+                    ctx.strokeStyle = 'rgba(100, 200, 255, 0.4)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(endPoint.x, endPoint.y, 12, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // 中层光圈
+                    ctx.strokeStyle = 'rgba(100, 200, 255, 0.6)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(endPoint.x, endPoint.y, 8, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // 内层填充
+                    ctx.fillStyle = 'rgba(100, 200, 255, 0.8)';
+                    ctx.beginPath();
+                    ctx.arc(endPoint.x, endPoint.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // 绘制当前持枪泡泡
+                drawBubble(currentBubble.x, currentBubble.y, currentBubble.colorIndex, 1, 0, true);
+            }
+
+            // 下一个泡泡预览
+            if (nextBubble) {
+                ctx.globalAlpha = 0.6;
+                drawBubble(canvas.width - 40, canvas.height - 40, nextBubble.colorIndex, 0.6, 0, false);
+                ctx.globalAlpha = 1;
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.font = '10px Orbitron';
+                ctx.textAlign = 'center';
+                ctx.fillText('NEXT', canvas.width - 40, canvas.height - 15);
+            }
+        }
+
+        function drawBubble(x, y, colorIndex, scale = 1, wobble = 0, isActive = false) {
+            const color = currentLevelColors[colorIndex];
+            const r = BUBBLE_RADIUS * scale;
+            const wobbleOffset = Math.sin(wobble) * 0.5;
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(1 + wobbleOffset * 0.02, 1 - wobbleOffset * 0.02);
+
+            // 外发光
+            if (isActive) {
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = color.glow;
+            }
+
+            // 主体渐变 - 尝试使用缓存，若不存在则动态创建
+            let gradient;
+            const cacheEntry = bubbleGradientCache.get(colorIndex);
+            if (cacheEntry && cacheEntry.gradients[scale]) {
+                gradient = cacheEntry.gradients[scale];
+            } else {
+                // 动态创建（用于非常用scale）
+                gradient = ctx.createRadialGradient(
+                    -r * 0.3, -r * 0.3, 0,
+                    0, 0, r
+                );
+                gradient.addColorStop(0, color.light);
+                gradient.addColorStop(0.5, color.main);
+                gradient.addColorStop(1, color.dark);
+            }
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 高光
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.beginPath();
+            ctx.ellipse(-r * 0.35, -r * 0.35, r * 0.25, r * 0.15, -Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 次高光
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.ellipse(-r * 0.15, -r * 0.5, r * 0.12, r * 0.08, -Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 边缘光晕 - 尝试使用缓存
+            let edgeGradient;
+            if (cacheEntry && cacheEntry.edgeGradients && cacheEntry.edgeGradients[scale]) {
+                edgeGradient = cacheEntry.edgeGradients[scale];
+            } else {
+                // 动态创建
+                edgeGradient = ctx.createRadialGradient(0, 0, r * 0.8, 0, 0, r);
+                edgeGradient.addColorStop(0, 'transparent');
+                edgeGradient.addColorStop(1, 'rgba(255,255,255,0.2)');
+            }
+            ctx.fillStyle = edgeGradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function endGame(allLevelsComplete = false) {
+            gameOver = true;
+            finalScoreElement.textContent = score;
+            gameOverElement.style.display = 'block';
+
+            if (allLevelsComplete) {
+                gameOverElement.querySelector('h2').textContent = '🎉 ALL LEVELS COMPLETE! 🎉';
+                gameOverElement.querySelector('p').textContent = 'You are a Master!';
+            } else {
+                gameOverElement.querySelector('h2').textContent = 'GAME OVER';
+                gameOverElement.querySelector('p').textContent = 'Final Score';
+            }
+
+            setTimeout(() => gameOverElement.classList.add('show'), 10);
+            playSound(200, 1, 'sawtooth', 0.3);
+        }
+
+        function restartGame() {
+            init();
+        }
+
+        // Event listeners
+        document.getElementById('restartBtn').addEventListener('click', restartGame);
+        document.getElementById('soundBtn').addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            document.getElementById('soundBtn').textContent = soundEnabled ? '♪' : '♪̸';
+            document.getElementById('soundBtn').style.opacity = soundEnabled ? '1' : '0.5';
+            if (soundEnabled) {
+                playSound(1000, 0.2, 'sine', 0.2);
+            }
+        });
+
+        // Start game
+        init();
+        animate();
+    </script>
+</body>
+</html>
